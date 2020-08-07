@@ -1,15 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap');
+
 html, body {
 	position: relative;
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 body {
 	color: #333;
 	margin: 0;
-	padding: 8px;
+	padding: 0;
 	box-sizing: border-box;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-family: 'Fira Code', monospace;
 }
 
 a {
