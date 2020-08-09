@@ -74,31 +74,6 @@ export const SMALL_ASF =
   end
 `
 
-export class ASFNode {
-    constructor(bone, children = [],
-        parent = null
-    ) {
-        this.id = bone.id;
-        this.name = bone.name;
-        this.direction = bone.direction;
-        this.length = bone.length;
-        this.axis = bone.axis;
-        this.axis_order = bone.axis_order;
-        this.dof = bone.dof;
-        this.limits = bone.limits;
-        this.children = children;
-        this.parent = parent;
-    }
-
-    parent() {
-        return this.parent;
-    }
-
-    name() {
-        return this.name;
-    }
-}
-
 export class ASFParser {
     TOKEN_KEYWORD_RGX = /^:(\w+)(?:\s+([\w\d\s\.]+))?/;
     TOKEN_COMMENT_RGX = /^#(.+)/;
@@ -331,13 +306,37 @@ export class ASFParser {
                     const SKIP_TYPES = ["BEGIN", "END", "WHITESPACE", "COMMENT"];
                     if (this.tokens[index].type == "RELATION") {
                         const rel = this.tokens[index].words;
-                        console.log(this.bones);
-
                         // We start searching the tree for the given keyword.
                         if (rel[0] == "root") {
-                            rel.slice(1)
+                            // Inject children into the tree
+                            for (const child_name of rel.slice(1)) {
+                                this.tree[child_name] = null;
+                            }
                         } else {
+                            // Traverse into the tree until we find the child.
+                            // If not, post an error.
+                            function traverse(tree) {
+                                if (!tree || Object.keys(tree).length == 0) {
+                                    return false;
+                                }
+                                
+                                for (const child in tree) {
+                                    if (child == rel[0]) {
+                                        tree[child] = {};
+                                        for (const future of rel.slice(1)) {
+                                            tree[child][future] = null;
+                                        }
+                                        return true;
+                                    } else if (traverse(tree[child])) {
+                                        return true;
+                                    }
+                                }
+                            }
 
+                            if (!traverse(this.tree)) {
+                                console.error("[2] warning! in hieradata loop, cannot find location for relation " + JSON.stringify(this.tokens[index]));
+                                this.errors.push("Confused relation " + JSON.stringify(this.tokens[index]) + " on index " + index + " in hierarchy data read.");
+                            }
                         }
                     } else if (!SKIP_TYPES.includes(this.tokens[index].type)) {
                         // Become lazy and just skip interpretation of begin/end.

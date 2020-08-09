@@ -23,6 +23,9 @@ const select = nextView => () => {
             class:nav-item-active="{selectedView === 'tweak'}"
             on:click="{select('tweak')}">🖱️ Tweak</div>
         <div class="nav-item"
+            class:nav-item-active="{selectedView === 'animate'}"
+            on:click="{select('animate')}">🏃‍♀️ Animate</div>
+        <div class="nav-item"
             class:nav-item-active="{selectedView === 'stage'}"
             on:click="{select('stage')}">🎭 Stage</div>
     </nav>
