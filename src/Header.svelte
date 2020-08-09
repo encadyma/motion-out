@@ -1,10 +1,30 @@
+<script>
+import { createEventDispatcher } from 'svelte';
+const dispatch = createEventDispatcher();
+
+export let selectedView;
+
+const select = nextView => () => {
+    selectedView = nextView;
+    dispatch('update');
+};
+</script>
+
 <header>
     <h1>Motion Out!</h1>
     <nav>
-        <div class="nav-item nav-item-active">👁️ View</div>
-        <div class="nav-item">💃 Pose</div>
-        <div class="nav-item">🖱️ Tweak</div>
-        <div class="nav-item">🎭 Stage</div>
+        <div class="nav-item"
+            class:nav-item-active="{selectedView === 'view'}"
+            on:click="{select('view')}">👁️ View</div>
+        <div class="nav-item"
+            class:nav-item-active="{selectedView === 'pose'}"
+            on:click="{select('pose')}">💃 Pose</div>
+        <div class="nav-item"
+            class:nav-item-active="{selectedView === 'tweak'}"
+            on:click="{select('tweak')}">🖱️ Tweak</div>
+        <div class="nav-item"
+            class:nav-item-active="{selectedView === 'stage'}"
+            on:click="{select('stage')}">🎭 Stage</div>
     </nav>
 </header>
 

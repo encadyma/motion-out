@@ -21,6 +21,8 @@ var elem;
 var camera, scene, renderer;
 var geometry, material, mesh;
 var ground, hemiLight, dirLight;
+
+export let asf;
  
 onMount(() => {
     init();
