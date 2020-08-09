@@ -24,6 +24,7 @@ export class AMCParser {
     player = {
         frame: 0,
         fps: 10,
+        playInterval: null,
     }
 
     /**

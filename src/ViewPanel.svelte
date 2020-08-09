@@ -22,7 +22,7 @@
 <li>Playback FPS: {amc.player.fps} fps</li>
 </ul>
 <h3>Credits</h3>
-<p>Project by Kevin Mo (@encadyma).</p>
+<p>Project by Kevin Mo (<a href="https://github.com/encadyma" target="_blank">@encadyma</a>).</p>
 <p>The data used in this project was obtained from mocap.cs.cmu.edu.
 The database was created with funding from NSF EIA-0196217.</p>
 </div>

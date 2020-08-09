@@ -3,16 +3,16 @@
 <div class="section-description">
 {#if amc.loaded}
 <h3>frame {amc.player.frame}</h3>
-<button on:click="{setFrame(0)}" disabled="{playInterval != null}">first frame</button>
-<button on:click="{setFrame(amc.player.frame - 1)}" disabled="{playInterval != null}">frame -1</button>
-{#if playInterval != null}
+<button on:click="{setFrame(0)}" disabled="{amc.player.playInterval != null}">first frame</button>
+<button on:click="{setFrame(amc.player.frame - 1)}" disabled="{amc.player.playInterval != null}">frame -1</button>
+{#if amc.player.playInterval != null}
 <button on:click="{stopPlay}">stop ({amc.player.fps} fps)</button>
 {:else}
 <button on:click="{slowPlay}">play ({amc.player.fps} fps)</button>
 {/if}
-<button on:click="{toggleFPS}" disabled="{playInterval != null}">toggle fps</button>
-<button on:click="{setFrame(amc.player.frame + 1)}" disabled="{playInterval != null}">frame +1</button>
-<button on:click="{setFrame(amc.frameCount - 1)}" disabled="{playInterval != null}">last frame</button>
+<button on:click="{toggleFPS}" disabled="{amc.player.playInterval != null}">toggle fps</button>
+<button on:click="{setFrame(amc.player.frame + 1)}" disabled="{amc.player.playInterval != null}">frame +1</button>
+<button on:click="{setFrame(amc.frameCount - 1)}" disabled="{amc.player.playInterval != null}">last frame</button>
 {:else}
 <p>Load some motion data first!</p>
 {/if}
@@ -25,7 +25,6 @@ import { createEventDispatcher } from 'svelte';
 
 const dispatch = createEventDispatcher();
 export let asf, amc;
-let playInterval = null;
 
 const setFrame = (frame) => () => {
     amc.player.frame = Math.max(0, Math.min(frame, amc.frameCount - 1));
@@ -33,8 +32,8 @@ const setFrame = (frame) => () => {
 }
 
 const slowPlay = () => {
-    if (playInterval == null) {
-        playInterval = setInterval(() => {
+    if (amc.player.playInterval == null) {
+        amc.player.playInterval = setInterval(() => {
             amc.player.frame = (amc.player.frame + 1) % amc.frameCount;
             dispatch('update');
         }, Math.round(1000 / amc.player.fps));
@@ -54,8 +53,8 @@ const toggleFPS = () => {
 }
 
 const stopPlay = () => {
-    clearInterval(playInterval);
-    playInterval = null;
+    clearInterval(amc.player.playInterval);
+    amc.player.playInterval = null;
 }
 </script>
 
