@@ -85,6 +85,8 @@ export class ASFParser {
     tokens = [];
     errors = [];
 
+    loaded = false;
+
     metadata = {
         version: null,
         name: "Not Loaded",
@@ -430,5 +432,7 @@ export class ASFParser {
 
             index++;
         }
+
+        this.loaded = true;
     }
 }

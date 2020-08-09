@@ -5,9 +5,21 @@
 <p>This project will focus on bringing motion data alive from CMU’s motion capture database onto a web platform (WebGL/HTML5 Canvas). Much of the challenge will come from translating the motion capture data (distributed in ASF/AMC/C3D) into useful movements for our skeleton and designing a system capable of rendering out these motions accurately and efficiently. With the goal of portability in mind, this project will also allow users to tweak the motion data and animate it on a given 3D character model.</p>
 <h3>Scene Information</h3>
 <ul>
-<li><b>Skeleton</b>: <span style="color: red;">Not loaded</span></li>
-<li><b>Pose</b>: <span style="color: red;">Not loaded</span></li>
-<li>Playback FPS: 60 fps</li>
+<li><b>Skeleton:</b>
+{#if asf.loaded}
+<span style="color: aqua;">{asf.metadata.name}</span>
+{:else}
+<span style="color: red;">Not loaded</span>
+{/if}
+</li>
+<li><b>Motion:</b>
+{#if amc.loaded}
+<span style="color: violet;">{amc.metadata.name}</span>
+{:else}
+<span style="color: red;">Not loaded</span>
+{/if}
+</li>
+<li>Playback FPS: {amc.player.fps} fps</li>
 </ul>
 <h3>Credits</h3>
 <p>Project by Kevin Mo (@encadyma).</p>
@@ -15,6 +27,10 @@
 The database was created with funding from NSF EIA-0196217.</p>
 </div>
 </section>
+
+<script>
+export let asf, amc;
+</script>
 
 <style>
 section {

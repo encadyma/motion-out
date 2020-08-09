@@ -1,7 +1,7 @@
 <section>
 <div class="section-header">💃 POSE PANEL</div>
 <div class="section-description">
-<p>Select a certain skeleton and a corresponding Mocap file, or upload your own.</p>
+<p>Select a bundled .ASF (CMU) skeleton file, or upload your own.</p>
 <button on:click="{processSmallASF}">Process sample ASF file</button><br/>
 <button on:click="{processASF}">Process full walk ASF file</button>
 <h3>Skeleton Info</h3>
