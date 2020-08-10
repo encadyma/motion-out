@@ -77,6 +77,7 @@ export const SMALL_ASF =
 import { readable } from 'svelte/store';
 import { toRadians } from './constants';
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 export class ASFParser {
     TOKEN_KEYWORD_RGX = /^:(\w+)(?:\s+([\w\d\s\.]+))?/;
@@ -466,6 +467,7 @@ export class ASFParser {
         this.three.bones = {};
 
         const root = new THREE.Bone();
+        root.name = this.root.name;
         root.position.x = this.root.position[0];
         root.position.y = this.root.position[1];
         root.position.z = this.root.position[2];
@@ -485,10 +487,12 @@ export class ASFParser {
 
             for (const child in tree) {
                 const bone = new THREE.Bone();
+                bone.name = child;
 
                 // Setup the position based on
                 // direction and length of the bone.
                 const position = (new THREE.Vector3(...bones[child].direction)).multiplyScalar(bones[child].length);
+                const rotation = (new THREE.Euler());
                 bone.position.x = position.x;
                 bone.position.y = position.y;
                 bone.position.z = position.z;
@@ -517,13 +521,73 @@ export class ASFParser {
      * based on incoming KEYDATA.
      */
     frameUpdate(keydata) {
+
         for (const boneName in keydata) {
+            if (!Object.keys(this.three.bones).includes(boneName)) {
+                this.errors.push(`Unknown bone name ${boneName} in key data found.`);
+                console.warn(`Unknown bone name ${boneName} in key data found.`);
+                continue;
+            }
+
             if (boneName == this.root.name) {
                 // Update root parameters.
-                
-            } else {
-
+                if (this.root.order.length != keydata[boneName].length) {
+                    // Incorrect # of parameters.
+                    this.errors.push(`Incorrect number of motion parameters for root node, ${keydata[boneName].length} provided.`);
+                    console.error(`incorrect number of motion parameters for root node, ${keydata[boneName].length} provided.`);
+                    continue;
+                }
             }
+
+            const order = boneName == this.root.name ? this.root.order : this.bones[boneName].dof;
+            const axis = boneName == this.root.name ? this.root.axis.join('') : this.bones[boneName].axis_order.join('');
+
+            const position = (new THREE.Vector3()).copy(this.three.bones[boneName].position);
+            const rotation = new THREE.Quaternion();
+            const quat = new THREE.Quaternion();
+
+            // FROM three.js source
+            var vx = new THREE.Vector3( 1, 0, 0 );
+			var vy = new THREE.Vector3( 0, 1, 0 );
+			var vz = new THREE.Vector3( 0, 0, 1 );
+            
+            for (let i = 0; i < order.length; i++) {
+                // Iterate over each parameter according to the labels.
+                // TODO: switch these to constants
+                switch(order[i]) {
+                    case "TX":
+                        position.x = keydata[boneName][i];
+                        break;
+                    case "TY":
+                        position.y = keydata[boneName][i];
+                        break;
+                    case "TZ":
+                        position.z = keydata[boneName][i];
+                        break;
+                    case "RX":
+                        quat.setFromAxisAngle(vx, toRadians(keydata[boneName][i]));
+                        rotation.multiply(quat);
+                        break;
+                    case "RY":
+                        quat.setFromAxisAngle(vy, toRadians(keydata[boneName][i]));
+                        rotation.multiply(quat);
+                        break;
+                    case "RZ":
+                        // rotation.z = toRadians(keydata[boneName][i]);
+                        quat.setFromAxisAngle(vz, toRadians(keydata[boneName][i]));
+                        rotation.multiply(quat);
+                        break;
+                    default:
+                        this.errors.push(`Unknown motion channel ${order[i]} provided.`);
+                        console.error(`unknown motion channel ${order[i]} provided`);
+                }
+            }
+            
+            this.three.bones[boneName].position.copy(position);
+            this.three.bones[boneName].setRotationFromQuaternion(rotation);
+            // console.log(position, rotation);
+            
         }
+        this.three.skeleton.update();
     }
 }

@@ -3,7 +3,8 @@
 <div class="section-description">
 <p>Select a bundled .ASF (CMU) skeleton file, or upload your own.</p>
 <button on:click="{processSmallASF}">Process sample ASF file</button><br/>
-<button on:click="{processASF}">Process full walk ASF file</button>
+<button on:click="{processASF(WalkASF)}">Process full walk ASF file</button>
+<button on:click="{processASF(GolfASF)}">Process full golf ASF file</button>
 <h3>Skeleton Info</h3>
 <ul>
 <li><b>Name:</b> {asf.metadata.name}</li>
@@ -25,12 +26,14 @@
 import { ASFParser, SMALL_ASF } from './parser/asf';
 import { createEventDispatcher } from 'svelte';
 import WalkASF from '../assets/asf/walk.asf';
+import GolfASF from '../assets/asf/golf.asf';
 
 const dispatch = createEventDispatcher();
 export let asf, scene;
 
 const processSmallASF = () => {
     if (asf.three.enabled) {
+        console.log("Cleaning up old scene objects from old ASF");
         scene.remove(asf.three.helper);
         scene.remove(asf.three.bones[asf.root.name]);
     }
@@ -44,14 +47,14 @@ const processSmallASF = () => {
     dispatch('update');
 }
 
-const processASF = () => {
+const processASF = (file) => () => {
     if (asf.three.enabled) {
         scene.remove(asf.three.helper);
         scene.remove(asf.three.bones[asf.root.name]);
     }
 
     asf = new ASFParser();
-    console.log(asf.tokenize(WalkASF));
+    console.log(asf.tokenize(file));
     asf.process();
     console.log(asf.construct());
     scene.add(asf.three.helper);

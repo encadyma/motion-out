@@ -2,7 +2,8 @@
 <div class="section-header">🏃‍♀️ ANIMATE PANEL</div>
 <div class="section-description">
 <p>Select an .AMC (CMU) Motion Capture file, or upload your own.</p>
-<button on:click="{processAMC}">Process walk3 AMC file</button>
+<button on:click="{processAMC(Walk3AMC)}">Process walk3 AMC file</button>
+<button on:click="{processAMC(Golf1AMC)}">Process golf1 AMC file</button>
 <h3>Skeleton Info</h3>
 <ul>
 <li><b>Name:</b> {asf.metadata.name}</li>
@@ -21,14 +22,15 @@
 import { AMCParser } from './parser/amc';
 import { createEventDispatcher } from 'svelte';
 import Walk3AMC from '../assets/amc/walk_03.amc';
+import Golf1AMC from '../assets/amc/golf_01.amc';
 
 const dispatch = createEventDispatcher();
 export let asf, amc;
 
-const processAMC = () => {
+const processAMC = (file) => () => {
     amc = new AMCParser();
     amc.setName("Walk_3");
-    console.log(amc.tokenize(Walk3AMC));
+    console.log(amc.tokenize(file));
     amc.process();
     dispatch('update');
 }

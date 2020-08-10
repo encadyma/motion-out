@@ -101,7 +101,7 @@ export class AMCParser {
                 let nextFrame = {};
                 index++;
 
-                while (this.tokens[index].type == "KEYDATA") {
+                while (index < this.tokens.length && this.tokens[index].type == "KEYDATA") {
                     const kdata = this.tokens[index].words;
                     nextFrame[kdata[0]] = kdata.slice(1).map(parseFloat);
                     index++;
