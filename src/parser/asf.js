@@ -110,7 +110,8 @@ export class ASFParser {
         order: [],
         axis: [],
         position: [],
-        orientation: []
+        orientation: [],
+        lastRotation: new THREE.Quaternion()
     };
 
     bones = {};
@@ -479,7 +480,7 @@ export class ASFParser {
 
         this.three.bones[this.root.name] = root;
 
-        function traverse(tree, parent, bones, three) {
+        function traverse(tree, parent, lastRotation, g) {
             // Traverse through the root node.
             if (tree == null) {
                 return;
@@ -489,24 +490,33 @@ export class ASFParser {
                 const bone = new THREE.Bone();
                 bone.name = child;
 
+                // Store the parent rotation somewhere.
+                lastRotation = lastRotation || new THREE.Quaternion();
+
                 // Setup the position based on
                 // direction and length of the bone.
-                const position = (new THREE.Vector3(...bones[child].direction)).multiplyScalar(bones[child].length);
-                const rotation = (new THREE.Euler());
+                const direction = (new THREE.Vector3(...g.bones[child].direction)).normalize();
+                const position = direction.clone().multiplyScalar(g.bones[child].length);
+                const rotation = (new THREE.Quaternion()).setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
+
                 bone.position.x = position.x;
                 bone.position.y = position.y;
                 bone.position.z = position.z;
 
+                // bone.quaternion.multiply(lastRotation.clone().inverse());
+                // bone.quaternion.multiply(rotation);
+
                 // Create the relation.
                 parent.add(bone);
-                three.bones[child] = bone;
+                g.three.bones[child] = bone;
+                g.bones[child].lastRotation = lastRotation.clone();
 
                 // Then we add more...
-                traverse(tree[child], bone, bones, three);
+                traverse(tree[child], bone, rotation, g);
             }
         }
 
-        traverse(this.tree, root, this.bones, this.three);
+        traverse(this.tree, root, new THREE.Quaternion(), this);
 
         // Create the skeleton from bones.
         this.three.skeleton = new THREE.Skeleton(Object.values(this.three.bones));
@@ -540,17 +550,19 @@ export class ASFParser {
             }
 
             const order = boneName == this.root.name ? this.root.order : this.bones[boneName].dof;
-            const axis = boneName == this.root.name ? this.root.axis.join('') : this.bones[boneName].axis_order.join('');
+            const axis_order = boneName == this.root.name ? this.root.axis.join('') : this.bones[boneName].axis_order.join('');
+            const axis_values = boneName == this.root.name ? this.root.orientation : this.bones[boneName].axis;
+
+            let axisEuler = new THREE.Euler(toRadians(axis_values[0]), toRadians(axis_values[1]), toRadians(axis_values[2]), axis_order);
+            const axis = new THREE.Quaternion();
+            // .setFromEuler does not operate properly, submitted new
+            // PR to get this fixed...
+            // axis.setFromEuler(axisEuler);
+            const inverseAxis = axis.clone().conjugate();
 
             const position = (new THREE.Vector3()).copy(this.three.bones[boneName].position);
-            const rotation = new THREE.Quaternion();
-            const quat = new THREE.Quaternion();
+            const rotation = this.three.bones[boneName].rotation.clone();
 
-            // FROM three.js source
-            var vx = new THREE.Vector3( 1, 0, 0 );
-			var vy = new THREE.Vector3( 0, 1, 0 );
-			var vz = new THREE.Vector3( 0, 0, 1 );
-            
             for (let i = 0; i < order.length; i++) {
                 // Iterate over each parameter according to the labels.
                 // TODO: switch these to constants
@@ -565,17 +577,16 @@ export class ASFParser {
                         position.z = keydata[boneName][i];
                         break;
                     case "RX":
-                        quat.setFromAxisAngle(vx, toRadians(keydata[boneName][i]));
-                        rotation.multiply(quat);
+                        rotation.x = toRadians(keydata[boneName][i]);
+                        // quat.setFromAxisAngle(vx, toRadians(keydata[boneName][i]));
                         break;
                     case "RY":
-                        quat.setFromAxisAngle(vy, toRadians(keydata[boneName][i]));
-                        rotation.multiply(quat);
+                        rotation.y = toRadians(keydata[boneName][i]);
+                        // quat.setFromAxisAngle(vy, toRadians(keydata[boneName][i]));
                         break;
                     case "RZ":
-                        // rotation.z = toRadians(keydata[boneName][i]);
-                        quat.setFromAxisAngle(vz, toRadians(keydata[boneName][i]));
-                        rotation.multiply(quat);
+                        rotation.z = toRadians(keydata[boneName][i]);
+                        // quat.setFromAxisAngle(vz, toRadians(keydata[boneName][i]));
                         break;
                     default:
                         this.errors.push(`Unknown motion channel ${order[i]} provided.`);
@@ -584,9 +595,23 @@ export class ASFParser {
             }
             
             this.three.bones[boneName].position.copy(position);
-            this.three.bones[boneName].setRotationFromQuaternion(rotation);
-            // console.log(position, rotation);
-            
+
+            const rootQuaternion = new THREE.Quaternion();
+
+            // Process the final rotation!
+            /*
+            const prefinalRotation = new THREE.Quaternion()
+                .multiply(axis)
+                .multiply(rootQuaternion)
+                .multiply(inverseAxis);
+
+            const finalRotation = new THREE.Quaternion()
+                .multiply((boneName == this.root.name ? this.root : this.bones[boneName]).lastRotation.clone().inverse())
+                .multiply(prefinalRotation)
+                .multiply(rotation);
+            */
+
+            this.three.bones[boneName].rotation.copy(rotation);            
         }
         this.three.skeleton.update();
     }
