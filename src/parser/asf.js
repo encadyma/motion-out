@@ -74,6 +74,10 @@ export const SMALL_ASF =
   end
 `
 
+import { readable } from 'svelte/store';
+import { toRadians } from './constants';
+import * as THREE from 'three';
+
 export class ASFParser {
     TOKEN_KEYWORD_RGX = /^:(\w+)(?:\s+([\w\d\s\.]+))?/;
     TOKEN_COMMENT_RGX = /^#(.+)/;
@@ -110,6 +114,21 @@ export class ASFParser {
 
     bones = {};
     tree = {};
+
+    three = {
+        enabled: false,
+        bones: {},
+        skeleton: null,
+        mesh: null,
+        helper: null,
+    };
+
+    editor = {
+        openedBones: {
+            "root": false,
+        },
+        currBone: "root",
+    };
 
     /**
      * Tokenizes a given ASF file for the parser,
@@ -413,6 +432,9 @@ export class ASFParser {
 
                         this.bones[nextBone.name] = nextBone;
 
+                        // Add the bone to the editor
+                        this.editor.openedBones[nextBone.name] = false;
+
                         if (this.tokens[index].type != "KEYWORD") {
                             // If forced out by next keyword, we break out of the bonedata read loop.
                             // Technically, this is incorrect syntax as there should
@@ -434,5 +456,74 @@ export class ASFParser {
         }
 
         this.loaded = true;
+    }
+
+    /**
+     * Constructs the three.js skeleton.
+     */
+    construct() {
+        // Setup the root node.
+        this.three.bones = {};
+
+        const root = new THREE.Bone();
+        root.position.x = this.root.position[0];
+        root.position.y = this.root.position[1];
+        root.position.z = this.root.position[2];
+
+        root.setRotationFromEuler(new THREE.Euler(
+            ...this.root.orientation.map(toRadians),
+            this.root.axis.join('')
+        ));
+
+        this.three.bones[this.root.name] = root;
+
+        function traverse(tree, parent, bones, three) {
+            // Traverse through the root node.
+            if (tree == null) {
+                return;
+            }
+
+            for (const child in tree) {
+                const bone = new THREE.Bone();
+
+                // Setup the position based on
+                // direction and length of the bone.
+                const position = (new THREE.Vector3(...bones[child].direction)).multiplyScalar(bones[child].length);
+                bone.position.x = position.x;
+                bone.position.y = position.y;
+                bone.position.z = position.z;
+
+                // Create the relation.
+                parent.add(bone);
+                three.bones[child] = bone;
+
+                // Then we add more...
+                traverse(tree[child], bone, bones, three);
+            }
+        }
+
+        traverse(this.tree, root, this.bones, this.three);
+
+        // Create the skeleton from bones.
+        this.three.skeleton = new THREE.Skeleton(Object.values(this.three.bones));
+        this.three.helper = new THREE.SkeletonHelper(root);
+
+        this.three.enabled = true;
+        return this.three.skeleton;
+    }
+
+    /**
+     * Imposes a keyframe on the current bones
+     * based on incoming KEYDATA.
+     */
+    frameUpdate(keydata) {
+        for (const boneName in keydata) {
+            if (boneName == this.root.name) {
+                // Update root parameters.
+                
+            } else {
+
+            }
+        }
     }
 }

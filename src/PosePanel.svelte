@@ -27,19 +27,35 @@ import { createEventDispatcher } from 'svelte';
 import WalkASF from '../assets/asf/walk.asf';
 
 const dispatch = createEventDispatcher();
-export let asf;
+export let asf, scene;
 
 const processSmallASF = () => {
+    if (asf.three.enabled) {
+        scene.remove(asf.three.helper);
+        scene.remove(asf.three.bones[asf.root.name]);
+    }
+
     asf = new ASFParser();
     console.log(asf.tokenize(SMALL_ASF));
     asf.process();
+    console.log(asf.construct());
+    scene.add(asf.three.helper);
+    scene.add(asf.three.bones[asf.root.name]);
     dispatch('update');
 }
 
 const processASF = () => {
+    if (asf.three.enabled) {
+        scene.remove(asf.three.helper);
+        scene.remove(asf.three.bones[asf.root.name]);
+    }
+
     asf = new ASFParser();
     console.log(asf.tokenize(WalkASF));
     asf.process();
+    console.log(asf.construct());
+    scene.add(asf.three.helper);
+    scene.add(asf.three.bones[asf.root.name]);
     dispatch('update');
 }
 </script>

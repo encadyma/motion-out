@@ -4,7 +4,7 @@
 {#if amc.loaded}
 <h3>frame {amc.player.frame}</h3>
 {#each Object.entries(amc.frames[amc.player.frame]) as data}
-<div class="key-item">
+<div class="key-item" class:key-item-missing="{!Object.keys(asf.bones).includes(data[0]) && data[0] != "root"}">
 <b class="key-item-name">{data[0]}</b>
 <span class="key-item-attributes">
 {#each data[1] as kdata}
@@ -49,6 +49,18 @@ section {
 
 .section-description {
     padding: 10px 20px;
+}
+
+.key-item-name {
+    color: lightgreen;
+}
+
+.key-item-missing > .key-item-name {
+    color: lightcoral;
+}
+
+.key-item-missing > .key-item-name:after {
+    content: '?';
 }
 
 .key-item-attr {

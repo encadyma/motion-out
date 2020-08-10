@@ -18,11 +18,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { onMount } from 'svelte';
 
 var elem;
-var camera, scene, renderer;
+var camera, renderer;
 var geometry, material, mesh;
 var ground, hemiLight, dirLight;
 
-export let asf;
+export let asf, scene;
  
 onMount(() => {
     init();
@@ -31,12 +31,12 @@ onMount(() => {
 
 function init() {
  
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
     camera.position.set( - 1, 2, 3 );
  
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x1a1a1a );
-    scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+    // scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
  
     geometry = new THREE.BoxGeometry( 0.65, 0.65, 0.65 );
     material = new THREE.MeshNormalMaterial();

@@ -28,6 +28,7 @@ export let asf, amc;
 
 const setFrame = (frame) => () => {
     amc.player.frame = Math.max(0, Math.min(frame, amc.frameCount - 1));
+    asf.frameUpdate(amc.frames[amc.player.frame]);
     dispatch('update');
 }
 
@@ -35,6 +36,7 @@ const slowPlay = () => {
     if (amc.player.playInterval == null) {
         amc.player.playInterval = setInterval(() => {
             amc.player.frame = (amc.player.frame + 1) % amc.frameCount;
+            asf.frameUpdate(amc.frames[amc.player.frame]);
             dispatch('update');
         }, Math.round(1000 / amc.player.fps));
     }
