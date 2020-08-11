@@ -34,7 +34,7 @@
 </style>
 
 <section>
-  <div class="section-header">🖱️ TWEAK PANEL</div>
+  <div class="section-header">🖱️ SKELETON TREE</div>
   <div class="section-description">
     {#if asf.loaded}
     <TweakTree bind:name="{asf.root.name}" bind:tree="{asf.tree}" bind:asf/>

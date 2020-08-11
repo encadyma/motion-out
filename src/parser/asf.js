@@ -59,6 +59,15 @@ export class ASFParser {
         currBone: "root",
     };
 
+    baked = {
+        status: false,
+        tracks: [],
+        name: null,
+        fps: 120,
+        clip: null,
+        mixer: null,
+    }
+
     /**
      * Tokenizes a given ASF file for the parser,
      * given in raw ASCII format.
@@ -458,8 +467,13 @@ export class ASFParser {
      * Imposes a keyframe on the current bones
      * based on incoming KEYDATA.
      */
-    frameUpdate(keydata) {
-        this.three.bones[this.root.name].updateMatrixWorld();
+    frameUpdate(keydata, updateBones = true) {
+        let result = {};
+
+        if (updateBones) {
+            this.three.bones[this.root.name].updateMatrixWorld();
+        }
+        
         for (const boneName in keydata) {
             if (!Object.keys(this.three.bones).includes(boneName)) {
                 this.errors.push(`Unknown bone name ${boneName} in key data found.`);
@@ -488,7 +502,6 @@ export class ASFParser {
             this.setFromEuler(axis, axisEuler);
             // axis.setFromEuler(axisEuler);
             const inverseAxis = axis.clone().conjugate();
-            console.log(axis);
 
             const position = (new THREE.Vector3()).copy(this.three.bones[boneName].position);
             
@@ -528,7 +541,6 @@ export class ASFParser {
                             m.makeRotationX(toRadians(keydata[boneName][i])),
                             transform
                         );
-                        // quat.setFromAxisAngle(vx, toRadians(keydata[boneName][i]));
                         break;
                     case "RY":
                         rotation.y = toRadians(keydata[boneName][i]);
@@ -536,7 +548,6 @@ export class ASFParser {
                             m.makeRotationY(toRadians(keydata[boneName][i])),
                             transform
                         );
-                        // quat.setFromAxisAngle(vy, toRadians(keydata[boneName][i]));
                         break;
                     case "RZ":
                         rotation.z = toRadians(keydata[boneName][i]);
@@ -544,7 +555,6 @@ export class ASFParser {
                             m.makeRotationZ(toRadians(keydata[boneName][i])),
                             transform
                         );
-                        // quat.setFromAxisAngle(vz, toRadians(keydata[boneName][i]));
                         break;
                     default:
                         this.errors.push(`Unknown motion channel ${order[i]} provided.`);
@@ -555,17 +565,13 @@ export class ASFParser {
             let newPos = new THREE.Vector3(),
                 newQuaternion = new THREE.Quaternion(),
                 newScale = new THREE.Vector3();
-
             
             transform.decompose(newPos, newQuaternion, newScale);
-            this.three.bones[boneName].position.copy(position);
 
-            /*
-            if (boneName == this.root.name) {
-                this.three.bones[boneName].position.copy(newPos);
-            }*/
-            
-            // this.three.bones[boneName].scale.copy(newScale);
+            if (updateBones) {
+                this.three.bones[boneName].position.copy(position);
+            }
+
             // Process the final rotation!
             
             const prefinalRotation = (new THREE.Quaternion())
@@ -578,11 +584,75 @@ export class ASFParser {
                 .multiply(prefinalRotation)
                 .multiply((boneName == this.root.name ? this.root : this.bones[boneName]).quatRotation.clone());
 
-            // this.three.bones[boneName].rotation.copy(rotation);
-            this.three.bones[boneName].quaternion.copy(finalRotation);
+            if (updateBones) {
+                this.three.bones[boneName].quaternion.copy(finalRotation);
+            }
+
+            // Push this to results.
+            result[boneName] = {
+                uuid: this.three.bones[boneName].uuid,
+                quaternion: finalRotation,
+                position: position,
+            };
         }
-        this.three.bones[this.root.name].updateMatrixWorld();
-        this.three.skeleton.update();
+
+        if (updateBones) {
+            this.three.bones[this.root.name].updateMatrixWorld();
+            this.three.skeleton.update();
+        }
+        
+        return result;
+    }
+
+    bake(amcFrames, amcName) {
+        const TIME_PER_FRAME = 1.0 / this.baked.fps;
+        this.baked.tracks = [];
+
+        let animationTracks = {};
+        if (amcFrames.length <= 0) {
+            console.error("There are no frames given.")
+            return;
+        }
+
+        for (const bone in amcFrames[0]) {
+            animationTracks[bone] = {
+                uuid: this.three.bones[bone].uuid,
+                position: [],
+                quaternion: [],
+            };
+        }
+
+        for (let f = 0; f < amcFrames.length; f++) {
+            const frame = this.frameUpdate(amcFrames[f], false);
+            for (const bone in frame) {
+                animationTracks[bone].position.push({
+                    time: f * TIME_PER_FRAME,
+                    value: frame[bone].position
+                });
+                animationTracks[bone].quaternion.push({
+                    time: f * TIME_PER_FRAME,
+                    value: frame[bone].quaternion
+                });
+            }
+        }
+
+        // Generate a track per bone in animation tracks.
+        for (const bone in animationTracks) {
+            this.baked.tracks.push(
+                new THREE.QuaternionKeyframeTrack(animationTracks[bone].uuid + '.quaternion', animationTracks[bone].quaternion)
+            );
+            this.baked.tracks.push(
+                new THREE.VectorKeyframeTrack(animationTracks[bone].uuid + '.position', animationTracks[bone].position)
+            );
+        }
+
+        this.baked.clip = new THREE.AnimationClip(amcName, TIME_PER_FRAME * amcFrames.length, this.baked.tracks);
+
+        this.baked.name = amcName;
+        this.baked.mixer = new THREE.AnimationMixer(this.three.skeleton);
+        this.baked.status = true;
+
+        return this.baked.clip;
     }
 
     setFromEuler(quat, euler) {

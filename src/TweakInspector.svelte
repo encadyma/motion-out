@@ -1,5 +1,17 @@
 <script>
   export let asf;
+
+  const quatToString = (quat) => {
+    return `Quaternion(${quat.x}, ${quat.y}, ${quat.z}, ${quat.w})`;
+  }
+
+  const eulerToString = (euler) => {
+    return `Euler(${euler.x}, ${euler.y}, ${euler.z})::${euler.order}`;
+  }
+
+  const vec3ToString = (vec) => {
+    return `Vector3(${vec.x}, ${vec.y}, ${vec.z})`;
+  }
 </script>
 
 <style>
@@ -55,6 +67,20 @@
         <li><b>constraints:</b> {asf.bones[asf.editor.currBone].limits}</li>
       </ul>
       {/if}
+      <h3>Skeleton Properties</h3>
+      {#if asf.three.skeleton.getBoneByName(asf.editor.currBone)}
+      <ul>
+        <li><b>uuid:</b> {asf.three.skeleton.getBoneByName(asf.editor.currBone).uuid}</li>
+        <li><b>position:</b> {vec3ToString(asf.three.bones[asf.editor.currBone].position)}</li>
+        <li><b>rotation:</b> {eulerToString(asf.three.bones[asf.editor.currBone].rotation)}</li>
+        <li><b>quaternion:</b> {quatToString(asf.three.bones[asf.editor.currBone].quaternion)}</li>
+      </ul>
+      {:else}
+      <p>Could not find the bone in the given skeleton.</p>
+      {/if}
+      <ul>
+      
+      </ul>
     {:else}
     <p>No element selected.</p>
     {/if}

@@ -6,9 +6,9 @@
 <button on:click="{setFrame(0)}" disabled="{amc.player.playInterval != null}">first frame</button>
 <button on:click="{setFrame(amc.player.frame - 1)}" disabled="{amc.player.playInterval != null}">frame -1</button>
 {#if amc.player.playInterval != null}
-<button on:click="{stopPlay}">stop ({amc.player.fps} fps)</button>
+<button on:click="{stopPlay}">slow stop ({amc.player.fps} fps)</button>
 {:else}
-<button on:click="{slowPlay}">play ({amc.player.fps} fps)</button>
+<button on:click="{slowPlay}" title="uses Javascript setInterval to play back animation">slow play ({amc.player.fps} fps)</button>
 {/if}
 <button on:click="{toggleFPS}" disabled="{amc.player.playInterval != null}">toggle fps</button>
 <button on:click="{setFrame(amc.player.frame + 1)}" disabled="{amc.player.playInterval != null}">frame +1</button>
@@ -38,7 +38,7 @@ const slowPlay = () => {
             amc.player.frame = (amc.player.frame + 1) % amc.frameCount;
             asf.frameUpdate(amc.frames[amc.player.frame]);
             dispatch('update');
-        }, Math.round(1000 / amc.player.fps));
+        }, Math.floor(1000 / amc.player.fps));
     }
 }
 
@@ -49,6 +49,10 @@ const toggleFPS = () => {
         amc.player.fps = 30;
     } else if (amc.player.fps == 30) {
         amc.player.fps = 60;
+    } else if (amc.player.fps == 60) {
+        amc.player.fps = 120;
+    } else if (amc.player.fps == 120) {
+        amc.player.fps = 1000;
     } else {
         amc.player.fps = 10;
     }
