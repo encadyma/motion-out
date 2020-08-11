@@ -83,7 +83,8 @@ function init() {
         function (error) {
 		    console.log( 'An error happened' );
 	    }
-    );*/
+    );
+    */
  
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setSize( window.innerWidth, window.innerHeight );

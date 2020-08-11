@@ -1,0 +1,69 @@
+## Example ASF file created for parsing purposes.
+# -----------------------------------------------
+:version 1.10
+:name Walk Skeleton Mini
+:namespace mo_walk
+:units
+  mass 1.0
+  length 0.45
+  angle deg
+:documentation
+   .ast/.asf automatically generated from VICON data using
+   VICON BodyBuilder and BodyLanguage model FoxedUp or BRILLIANT.MOD
+:root
+   order TX TY TZ RX RY RZ
+   axis XYZ
+   position 0 0 0  
+   orientation 0 0 0 
+:bonedata
+  begin
+     id 1 
+     name lhipjoint
+     direction 0.692024 -0.648617 0.316857 
+     length 2.68184 
+     axis 0 0 0  XYZ
+  end
+  begin
+     id 27 
+     name rwrist
+     direction -1 -4.48953e-011 1.43537e-026   
+     length 1.68252   
+     axis -9.31228e-015 -90 -90   XYZ
+    dof ry
+    limits (-180.0 0.0)
+  end
+  begin
+     id 28
+     name rhand
+     direction -1 -4.48961e-011 2.87071e-026   
+     length 0.620444   
+     axis -1.83174e-014 -90 -90   XYZ
+    dof rx rz
+    limits (-90.0 90.0)
+           (-45.0 45.0)
+  end
+  begin
+     id 29
+     name rfingers
+     direction -1 -4.49037e-011 5.74091e-026   
+     length 0.500218   
+     axis -3.66347e-014 -90 -90   XYZ
+    dof rx
+    limits (0.0 90.0)
+  end
+  begin
+     id 30
+     name rthumb
+     direction -0.707107 -6.34961e-011 0.707107   
+     length 0.718216   
+     axis -90 -45 6.68868e-015   XYZ
+    dof rx rz
+    limits (-45.0 45.0)
+           (-45.0 45.0)
+  end
+:hierarchy
+  begin
+    root rwrist
+    rwrist rhand rthumb
+    rhand rfingers
+  end

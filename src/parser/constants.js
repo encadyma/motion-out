@@ -25,6 +25,12 @@ export const ASF_FILES = {
         namespace: "WALK",
         src: "assets/asf/walk.asf"
     },
+    "debug": {
+        id: "debug",
+        name: "Debug",
+        namespace: "DEBUG",
+        src: "assets/asf/debug.asf"
+    }
 }
 
 export const MMD_FILES = {
@@ -35,13 +41,15 @@ export const MMD_FILES = {
         author: "Cover Corp.",
         website: "https://www.mmd.hololive.tv/",
         bonemap: {
-            "root": "root",
-            "lowerback": "lowerback",
-            "upperback": "upperback",
+            "root": "全ての親",         // Maybe センター
+            "lhipjoint": "左足ＩＫ",
+            "rhipjoint": "右足ＩＫ",
+            "lowerback": "センター",
+            "upperback": "腰",
             "thorax": "thorax",
             "lowerneck": "lowerneck",
             "upperneck": "upperneck",
-            "head": "head",
+            "head": "頭",
             "rclavicle": "rclavicle",
             "rhumerus": "rhumerus",
             "rradius": "rradius",

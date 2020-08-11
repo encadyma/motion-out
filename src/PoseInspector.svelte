@@ -38,17 +38,11 @@
 </section>
 
 <script>
-import { ASFParser, SMALL_ASF } from './parser/asf';
+import { ASFParser } from './parser/asf';
 import { createEventDispatcher } from 'svelte';
 
 const dispatch = createEventDispatcher();
 export let asf;
-
-const processASF = () => {
-    asf = new ASFParser();
-    console.log(asf.tokenize(SMALL_ASF));
-    dispatch('update');
-}
 </script>
 
 <style>

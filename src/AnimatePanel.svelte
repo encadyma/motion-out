@@ -2,8 +2,16 @@
 <div class="section-header">🏃‍♀️ ANIMATE PANEL</div>
 <div class="section-description">
 <p>Select an .AMC (CMU) Motion Capture file, or upload your own.</p>
-<button on:click="{processAMC(Walk3AMC)}">Process walk3 AMC file</button>
-<button on:click="{processAMC(Golf1AMC)}">Process golf1 AMC file</button>
+<select bind:value="{selectedAMC}">
+  {#each Object.keys(AMC_FILES) as amcgroup}
+    <optgroup label="{amcgroup}">
+      {#each AMC_FILES[amcgroup] as amcObj}
+        <option value="{amcObj}">{amcObj.name} ({amcObj.name}.amc)</option>
+      {/each}
+    </optgroup>
+  {/each}
+</select>
+<button on:click="{processAMC(selectedAMC)}">Process AMC file</button>
 <h3>Skeleton Info</h3>
 <ul>
 <li><b>Name:</b> {asf.metadata.name}</li>
@@ -20,20 +28,26 @@
 
 <script>
 import { AMCParser } from './parser/amc';
-import { createEventDispatcher } from 'svelte';
-import Walk3AMC from '../assets/amc/walk_03.amc';
-import Golf1AMC from '../assets/amc/golf_01.amc';
+import { AMC_FILES } from "./parser/constants";
 
-const dispatch = createEventDispatcher();
+let selectedAMC;
 export let asf, amc;
 
-const processAMC = (file) => () => {
-    amc = new AMCParser();
-    amc.setName("Walk_3");
-    console.log(amc.tokenize(file));
-    amc.process();
-    dispatch('update');
-}
+const processAMC = amcObj => async () => {
+    // Setup the XMLHttpRequest for reading
+    // the file location
+    try {
+      const data = await (await fetch(amcObj.src)).text();
+      amc = new AMCParser();
+      amc.setName(amcObj.name);
+      amc.tokenize(data);
+      amc.process();
+      amc = amc;
+    } catch (e) {
+      alert("could not load the file @ " + file + "!");
+      console.error("could not load the file @ " + file + "!", e);
+    }
+};
 </script>
 
 <style>
