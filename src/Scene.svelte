@@ -16,10 +16,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { onMount } from 'svelte';
 
 var elem;
-var camera, renderer, clock;
+var camera, renderer, clock, stats;
 var geometry, material, mesh;
 var ground, hemiLight, dirLight;
 
@@ -89,7 +90,15 @@ function init() {
 	    }
     );
     */
- 
+
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = 'auto';
+    stats.domElement.style.bottom = '10px';
+    stats.domElement.style.left = 'auto';
+    stats.domElement.style.right = '10px';
+    elem.appendChild( stats.domElement );
+
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setSize( window.innerWidth, window.innerHeight );
     elem.appendChild(renderer.domElement); 
@@ -112,6 +121,7 @@ function animate() {
     mesh.rotation.y += 0.02;
  
     renderer.render( scene, camera );
- 
+
+    stats.update();
 }
 </script>

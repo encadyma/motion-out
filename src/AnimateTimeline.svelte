@@ -71,7 +71,7 @@
     max-height: 150px;
     width: calc(100vw - 100px);
     position: absolute;
-    bottom: 50px;
+    bottom: 60px;
     left: 50px;
     z-index: 100;
     box-shadow: 0px 2px 8px 4px rgba(0, 0, 0, 0.2);
