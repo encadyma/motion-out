@@ -1,5 +1,5 @@
 {
-  "name": "svelte-app",
+  "name": "motion-out",
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
@@ -11,6 +11,7 @@
     "@rollup/plugin-commonjs": "^12.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
     "rollup": "^2.3.4",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-svelte": "^5.0.3",

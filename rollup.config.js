@@ -4,6 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import { string } from "rollup-plugin-string";
+import copy from 'rollup-plugin-copy';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -45,6 +46,12 @@ export default {
 			css: css => {
 				css.write('public/build/bundle.css');
 			}
+		}),
+
+		copy({
+			targets: [
+				{ src: 'assets/*', dest: 'public/assets' }
+			]
 		}),
 
 		string({
