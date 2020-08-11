@@ -17,14 +17,14 @@
 
       if (asf.three.enabled) {
         scene.remove(asf.three.helper);
-        scene.remove(asf.three.bones[asf.root.name]);
+        scene.remove(asf.three.container);
       }
       asf = new ASFParser();
       console.log(asf.tokenize(data));
       asf.process();
       console.log(asf.construct());
       scene.add(asf.three.helper);
-      scene.add(asf.three.bones[asf.root.name]);
+      scene.add(asf.three.container);
       asf = asf;
     } catch (e) {
       alert("could not load the file @ " + file + "!");

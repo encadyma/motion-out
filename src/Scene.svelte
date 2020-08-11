@@ -19,7 +19,7 @@ import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import { onMount } from 'svelte';
 
 var elem;
-var camera, renderer;
+var camera, renderer, clock;
 var geometry, material, mesh;
 var ground, hemiLight, dirLight;
 
@@ -38,6 +38,8 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x1a1a1a );
     // scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+
+    clock = new THREE.Clock();
  
     geometry = new THREE.BoxGeometry( 0.65, 0.65, 0.65 );
     material = new THREE.MeshNormalMaterial();
@@ -101,6 +103,10 @@ function init() {
 function animate() {
  
     requestAnimationFrame( animate );
+
+    var delta = clock.getDelta();
+
+	if ( asf.baked.mixer ) asf.baked.mixer.update( delta );
  
     mesh.rotation.x += 0.01;
     mesh.rotation.y += 0.02;

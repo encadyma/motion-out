@@ -48,6 +48,7 @@ export class ASFParser {
         enabled: false,
         bones: {},
         skeleton: null,
+        container: null,
         mesh: null,
         helper: null,
     };
@@ -57,6 +58,7 @@ export class ASFParser {
             "root": false,
         },
         currBone: "root",
+        isBaking: false,
     };
 
     baked = {
@@ -66,6 +68,7 @@ export class ASFParser {
         fps: 120,
         clip: null,
         mixer: null,
+        action: null,
     }
 
     /**
@@ -457,7 +460,12 @@ export class ASFParser {
 
         // Create the skeleton from bones.
         this.three.skeleton = new THREE.Skeleton(Object.values(this.three.bones));
+
         this.three.helper = new THREE.SkeletonHelper(root);
+        this.three.helper.skeleton = this.three.skeleton;
+
+        this.three.container = new THREE.Group();
+        this.three.container.add(root);
 
         this.three.enabled = true;
         return this.three.skeleton;
@@ -617,6 +625,7 @@ export class ASFParser {
         for (const bone in amcFrames[0]) {
             animationTracks[bone] = {
                 uuid: this.three.bones[bone].uuid,
+                times: [],
                 position: [],
                 quaternion: [],
             };
@@ -625,34 +634,43 @@ export class ASFParser {
         for (let f = 0; f < amcFrames.length; f++) {
             const frame = this.frameUpdate(amcFrames[f], false);
             for (const bone in frame) {
-                animationTracks[bone].position.push({
-                    time: f * TIME_PER_FRAME,
-                    value: frame[bone].position
-                });
-                animationTracks[bone].quaternion.push({
-                    time: f * TIME_PER_FRAME,
-                    value: frame[bone].quaternion
-                });
+                animationTracks[bone].times.push(f * TIME_PER_FRAME);
+
+                // Due to the way KeyframeTracks store values in a Float32Array,
+                // each value must be unpacked.
+                animationTracks[bone].position.push(...frame[bone].position.toArray());
+                animationTracks[bone].quaternion.push(...frame[bone].quaternion.toArray());
             }
         }
 
         // Generate a track per bone in animation tracks.
         for (const bone in animationTracks) {
             this.baked.tracks.push(
-                new THREE.QuaternionKeyframeTrack(animationTracks[bone].uuid + '.quaternion', animationTracks[bone].quaternion)
+                new THREE.QuaternionKeyframeTrack(
+                    // animationTracks[bone].uuid + '.quaternion',
+                    `.bones[${bone}].quaternion`,
+                    animationTracks[bone].times,
+                    animationTracks[bone].quaternion
+                )
             );
             this.baked.tracks.push(
-                new THREE.VectorKeyframeTrack(animationTracks[bone].uuid + '.position', animationTracks[bone].position)
+                new THREE.VectorKeyframeTrack(
+                    // animationTracks[bone].uuid + '.position',
+                    `.bones[${bone}].position`,
+                    animationTracks[bone].times,
+                    animationTracks[bone].position
+                )
             );
         }
 
         this.baked.clip = new THREE.AnimationClip(amcName, TIME_PER_FRAME * amcFrames.length, this.baked.tracks);
 
         this.baked.name = amcName;
-        this.baked.mixer = new THREE.AnimationMixer(this.three.skeleton);
+        this.baked.mixer = new THREE.AnimationMixer(this.three.helper);
+        this.baked.action = this.baked.mixer.clipAction(this.baked.clip).setEffectiveWeight(1.0);
         this.baked.status = true;
 
-        return this.baked.clip;
+        return this.baked.action;
     }
 
     setFromEuler(quat, euler) {
