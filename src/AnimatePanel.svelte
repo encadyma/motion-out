@@ -1,8 +1,8 @@
 <section>
 <div class="section-header">🏃‍♀️ ANIMATE PANEL</div>
 <div class="section-description">
-<p>Select an .AMC (CMU) Motion Capture file, or upload your own.</p>
-<select bind:value="{selectedAMC}">
+<p>Select an .AMC (CMU) Motion Capture file from the list below.</p>
+<select bind:value="{selectedAMC}" disabled="{amc.player.playInterval != null}">
   {#each Object.keys(AMC_FILES) as amcgroup}
     <optgroup label="{amcgroup}">
       {#each AMC_FILES[amcgroup] as amcObj}
@@ -11,7 +11,7 @@
     </optgroup>
   {/each}
 </select>
-<button on:click="{processAMC(selectedAMC)}">Process AMC file</button>
+<button on:click="{processAMC(selectedAMC)}" disabled="{amc.player.playInterval != null}">Process AMC file</button>
 <h3>Skeleton Info</h3>
 <ul>
 <li><b>Name:</b> {asf.metadata.name}</li>

@@ -4,12 +4,20 @@ export const toRadians = val => (val * TO_RADIANS);
 
 export const AMC_FILES = {
     "golf": [
-        { name: "golf_01", src: "assets/amc/golf_01.amc" },
+        { name: "golf_01", src: "assets/amc/golf/golf_01.amc" },
     ],
     "walk": [
-        { name: "walk_03", src: "assets/amc/walk_03.amc" },
+        { name: "walk_03", src: "assets/amc/walk/walk_03.amc" },
     ],
-    "debug": []
+    "debug": [],
+    "moderndance": [
+        { name: "md_walk", src: "assets/amc/moderndance/md_walk.amc" },
+        { name: "md_02", src: "assets/amc/moderndance/md_02.amc" },
+        { name: "md_03", src: "assets/amc/moderndance/md_03.amc" },
+        { name: "md_04", src: "assets/amc/moderndance/md_04.amc" },
+        { name: "md_05", src: "assets/amc/moderndance/md_05.amc" },
+        { name: "md_07", src: "assets/amc/moderndance/md_07.amc" },
+    ]
 };
 
 export const ASF_FILES = {
@@ -30,6 +38,12 @@ export const ASF_FILES = {
         name: "Debug",
         namespace: "DEBUG",
         src: "assets/asf/debug.asf"
+    },
+    "moderndance": {
+        id: "moderndance",
+        name: "Modern Dance",
+        namespace: "MODERNDANCE",
+        src: "assets/asf/moderndance.asf"
     }
 }
 

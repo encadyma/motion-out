@@ -32,8 +32,8 @@ onMount(() => {
 
 function init() {
  
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
-    camera.position.set( - 1, 2, 3 );
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 1000 );
+    camera.position.set( 0, 20, 30 );
  
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x1a1a1a );
@@ -41,6 +41,8 @@ function init() {
  
     geometry = new THREE.BoxGeometry( 0.65, 0.65, 0.65 );
     material = new THREE.MeshNormalMaterial();
+
+    scene.add( new THREE.GridHelper( 100, 40 ) );
     
     // Attach hemisphere and directional lighting
     // Scene courtesy of mrdoob three.js official examples
@@ -62,7 +64,7 @@ function init() {
     ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 	ground.rotation.x = - Math.PI / 2;
 	ground.receiveShadow = true;
-	scene.add( ground );
+	// scene.add( ground );
 
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.y = 1;

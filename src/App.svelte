@@ -27,7 +27,7 @@ let alerts = writable([]);
 	{#if selectedView == 'view'}
 	<ViewPanel bind:asf bind:amc/>
 	{:else if selectedView == 'pose'}
-	<PosePanel bind:asf bind:scene/>
+	<PosePanel bind:asf bind:amc bind:scene/>
 	<PoseInspector bind:asf/>
 	{:else if selectedView == 'tweak'}
 	<TweakPanel bind:asf/>

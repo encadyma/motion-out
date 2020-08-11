@@ -7,7 +7,7 @@
 
   const dispatch = createEventDispatcher();
   let selectedASF;
-  export let asf, scene;
+  export let asf, amc, scene;
 
   const processASF = file => async () => {
     // Setup the XMLHttpRequest for reading
@@ -60,13 +60,13 @@
 <section>
   <div class="section-header">💃 POSE PANEL</div>
   <div class="section-description">
-    <p>Select a bundled .ASF (CMU) skeleton file, or upload your own.</p>
-    <select bind:value="{selectedASF}">
+    <p>Select a bundled .ASF (CMU) skeleton file from the list below.</p>
+    <select bind:value="{selectedASF}" disabled="{amc.player.playInterval != null}">
       {#each Object.values(ASF_FILES) as asf}
         <option value="{asf.src}">{asf.name} ({asf.id}.asf)</option>
       {/each}
     </select>
-    <button on:click="{processASF(selectedASF)}">
+    <button disabled="{amc.player.playInterval != null}" on:click="{processASF(selectedASF)}">
       Process ASF skeleton file
     </button>
     <h3>Skeleton Info</h3>
