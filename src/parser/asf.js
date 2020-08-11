@@ -111,7 +111,8 @@ export class ASFParser {
         axis: [],
         position: [],
         orientation: [],
-        lastRotation: new THREE.Quaternion()
+        lastRotation: new THREE.Quaternion(),
+        quatRotation: new THREE.Quaternion()
     };
 
     bones = {};
@@ -480,7 +481,7 @@ export class ASFParser {
 
         this.three.bones[this.root.name] = root;
 
-        function traverse(tree, parent, lastRotation, g) {
+        function traverse(tree, parent, newPos, lastRotation, g) {
             // Traverse through the root node.
             if (tree == null) {
                 return;
@@ -496,27 +497,28 @@ export class ASFParser {
                 // Setup the position based on
                 // direction and length of the bone.
                 const direction = (new THREE.Vector3(...g.bones[child].direction)).normalize();
-                const position = direction.clone().multiplyScalar(g.bones[child].length);
                 const rotation = (new THREE.Quaternion()).setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
+                const position = newPos || new THREE.Vector3();
 
                 bone.position.x = position.x;
                 bone.position.y = position.y;
                 bone.position.z = position.z;
 
-                // bone.quaternion.multiply(lastRotation.clone().inverse());
-                // bone.quaternion.multiply(rotation);
+                bone.quaternion.multiply(lastRotation.clone().inverse());
+                bone.quaternion.multiply(rotation);
 
                 // Create the relation.
                 parent.add(bone);
                 g.three.bones[child] = bone;
+                g.bones[child].quatRotation = rotation.clone();
                 g.bones[child].lastRotation = lastRotation.clone();
 
                 // Then we add more...
-                traverse(tree[child], bone, rotation, g);
+                traverse(tree[child], bone, new THREE.Vector3(0, 0, g.bones[child].length), rotation, g);
             }
         }
 
-        traverse(this.tree, root, new THREE.Quaternion(), this);
+        traverse(this.tree, root, new THREE.Vector3(), new THREE.Quaternion(), this);
 
         // Create the skeleton from bones.
         this.three.skeleton = new THREE.Skeleton(Object.values(this.three.bones));
@@ -531,7 +533,7 @@ export class ASFParser {
      * based on incoming KEYDATA.
      */
     frameUpdate(keydata) {
-
+        this.three.bones[this.root.name].updateMatrixWorld();
         for (const boneName in keydata) {
             if (!Object.keys(this.three.bones).includes(boneName)) {
                 this.errors.push(`Unknown bone name ${boneName} in key data found.`);
@@ -555,37 +557,67 @@ export class ASFParser {
 
             let axisEuler = new THREE.Euler(toRadians(axis_values[0]), toRadians(axis_values[1]), toRadians(axis_values[2]), axis_order);
             const axis = new THREE.Quaternion();
-            // .setFromEuler does not operate properly, submitted new
+            // NOTE: .setFromEuler does not operate properly, submitted new
             // PR to get this fixed...
+            this.setFromEuler(axis, axisEuler);
             // axis.setFromEuler(axisEuler);
             const inverseAxis = axis.clone().conjugate();
+            console.log(axis);
 
             const position = (new THREE.Vector3()).copy(this.three.bones[boneName].position);
+            
             const rotation = this.three.bones[boneName].rotation.clone();
+            const transform = new THREE.Matrix4();
 
             for (let i = 0; i < order.length; i++) {
                 // Iterate over each parameter according to the labels.
                 // TODO: switch these to constants
+                const m = new THREE.Matrix4();
+
                 switch(order[i]) {
                     case "TX":
                         position.x = keydata[boneName][i];
+                        transform.multiplyMatrices(
+                            m.makeTranslation(keydata[boneName][i], 0, 0),
+                            transform
+                        );
                         break;
                     case "TY":
                         position.y = keydata[boneName][i];
+                        transform.multiplyMatrices(
+                            m.makeTranslation(0, keydata[boneName][i], 0),
+                            transform
+                        );
                         break;
                     case "TZ":
                         position.z = keydata[boneName][i];
+                        transform.multiplyMatrices(
+                            m.makeTranslation(0, 0, keydata[boneName][i]),
+                            transform
+                        );
                         break;
                     case "RX":
                         rotation.x = toRadians(keydata[boneName][i]);
+                        transform.multiplyMatrices(
+                            m.makeRotationX(toRadians(keydata[boneName][i])),
+                            transform
+                        );
                         // quat.setFromAxisAngle(vx, toRadians(keydata[boneName][i]));
                         break;
                     case "RY":
                         rotation.y = toRadians(keydata[boneName][i]);
+                        transform.multiplyMatrices(
+                            m.makeRotationY(toRadians(keydata[boneName][i])),
+                            transform
+                        );
                         // quat.setFromAxisAngle(vy, toRadians(keydata[boneName][i]));
                         break;
                     case "RZ":
                         rotation.z = toRadians(keydata[boneName][i]);
+                        transform.multiplyMatrices(
+                            m.makeRotationZ(toRadians(keydata[boneName][i])),
+                            transform
+                        );
                         // quat.setFromAxisAngle(vz, toRadians(keydata[boneName][i]));
                         break;
                     default:
@@ -593,26 +625,106 @@ export class ASFParser {
                         console.error(`unknown motion channel ${order[i]} provided`);
                 }
             }
+
+            let newPos = new THREE.Vector3(),
+                newQuaternion = new THREE.Quaternion(),
+                newScale = new THREE.Vector3();
+
             
+            transform.decompose(newPos, newQuaternion, newScale);
             this.three.bones[boneName].position.copy(position);
 
-            const rootQuaternion = new THREE.Quaternion();
-
-            // Process the final rotation!
             /*
-            const prefinalRotation = new THREE.Quaternion()
+            if (boneName == this.root.name) {
+                this.three.bones[boneName].position.copy(newPos);
+            }*/
+            
+            // this.three.bones[boneName].scale.copy(newScale);
+            // Process the final rotation!
+            
+            const prefinalRotation = (new THREE.Quaternion())
                 .multiply(axis)
-                .multiply(rootQuaternion)
+                .multiply(newQuaternion)
                 .multiply(inverseAxis);
-
-            const finalRotation = new THREE.Quaternion()
+            
+            const finalRotation = (new THREE.Quaternion())
                 .multiply((boneName == this.root.name ? this.root : this.bones[boneName]).lastRotation.clone().inverse())
                 .multiply(prefinalRotation)
-                .multiply(rotation);
-            */
+                .multiply((boneName == this.root.name ? this.root : this.bones[boneName]).quatRotation.clone());
 
-            this.three.bones[boneName].rotation.copy(rotation);            
+            // this.three.bones[boneName].rotation.copy(rotation);
+            this.three.bones[boneName].quaternion.copy(finalRotation);
         }
+        this.three.bones[this.root.name].updateMatrixWorld();
         this.three.skeleton.update();
+    }
+
+    setFromEuler(quat, euler) {
+        // three.js does not patch this until r120. PR#20042.
+        // Until then, I'm bringing the math to this project...
+        const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
+
+        const cos = Math.cos;
+		const sin = Math.sin;
+
+		const c1 = cos( x / 2 );
+		const c2 = cos( y / 2 );
+		const c3 = cos( z / 2 );
+
+		const s1 = sin( x / 2 );
+		const s2 = sin( y / 2 );
+        const s3 = sin( z / 2 );
+        
+        switch ( order ) {
+
+			case 'XYZ':
+				quat._x = s1 * c2 * c3 + c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 - s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 + s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 - s1 * s2 * s3;
+				break;
+
+			case 'YXZ':
+				quat._x = s1 * c2 * c3 + c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 - s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 - s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 + s1 * s2 * s3;
+				break;
+
+			case 'ZXY':
+				quat._x = s1 * c2 * c3 - c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 + s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 + s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 - s1 * s2 * s3;
+				break;
+
+			case 'ZYX':
+				quat._x = s1 * c2 * c3 - c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 + s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 - s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 + s1 * s2 * s3;
+				break;
+
+			case 'YZX':
+				quat._x = s1 * c2 * c3 + c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 + s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 - s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 - s1 * s2 * s3;
+				break;
+
+			case 'XZY':
+				quat._x = s1 * c2 * c3 - c1 * s2 * s3;
+				quat._y = c1 * s2 * c3 - s1 * c2 * s3;
+				quat._z = c1 * c2 * s3 + s1 * s2 * c3;
+				quat._w = c1 * c2 * c3 + s1 * s2 * s3;
+				break;
+
+			default:
+				console.warn( 'Inner THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
+
+        }
+        
+        quat._onChangeCallback();
+        return quat;
     }
 }

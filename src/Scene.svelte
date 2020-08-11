@@ -15,6 +15,7 @@
 <script>
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import { onMount } from 'svelte';
 
 var elem;
@@ -66,6 +67,23 @@ function init() {
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.y = 1;
     scene.add( mesh );
+
+    // Import Korone!
+    /*
+    let mmd_loader = new MMDLoader();
+    mmd_loader.load(
+        'assets/mmd/korone/戌神ころね＿v4.pmx',
+        function (mesh) {
+            console.log(mesh);
+            scene.add(mesh);
+        },
+        function (xhr) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        function (error) {
+		    console.log( 'An error happened' );
+	    }
+    );*/
  
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setSize( window.innerWidth, window.innerHeight );
