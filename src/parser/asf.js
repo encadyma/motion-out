@@ -51,6 +51,7 @@ export class ASFParser {
         container: null,
         mesh: null,
         helper: null,
+        stage: null
     };
 
     editor = {
@@ -59,6 +60,20 @@ export class ASFParser {
         },
         currBone: "root",
         isBaking: false,
+        mmdView: false,
+    };
+
+    mmd = {
+        loaded: false,
+        mesh: null,
+        metadata: {
+            src: null,
+            name: "No Model",
+            author: "None"
+        },
+        bonemap: {},
+        helper: null,
+        currBone: null
     };
 
     baked = {
@@ -576,10 +591,6 @@ export class ASFParser {
             
             transform.decompose(newPos, newQuaternion, newScale);
 
-            if (updateBones) {
-                this.three.bones[boneName].position.copy(position);
-            }
-
             // Process the final rotation!
             
             const prefinalRotation = (new THREE.Quaternion())
@@ -593,7 +604,21 @@ export class ASFParser {
                 .multiply((boneName == this.root.name ? this.root : this.bones[boneName]).quatRotation.clone());
 
             if (updateBones) {
+                this.three.bones[boneName].position.copy(position);
                 this.three.bones[boneName].quaternion.copy(finalRotation);
+
+                if (this.mmd.loaded && Object.keys(this.mmd.bonemap).includes(boneName) && this.mmd.bonemap[boneName] != null) {
+                    // Attempt to puppet the MMD model as well
+                    const mmdbone = this.mmd.mesh.skeleton.getBoneByName(this.mmd.bonemap[boneName]);
+                    if (mmdbone) {
+                        
+                        if (boneName == this.root.name) {
+                            mmdbone.position.copy(position.clone().add(new THREE.Vector3(30, 0, 30)));
+                        }
+                        // mmdbone.position.copy(position);
+                        mmdbone.quaternion.copy(finalRotation);
+                    }
+                }
             }
 
             // Push this to results.

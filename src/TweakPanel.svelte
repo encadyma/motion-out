@@ -1,9 +1,15 @@
 <script>
   import TweakTree from './TweakTree.svelte';
-  import { createEventDispatcher } from "svelte";
-  import WalkASF from "../assets/asf/walk.asf";
+  import TweakThreeTree from './TweakThreeTree.svelte';
 
-  const dispatch = createEventDispatcher();
+  const setView = (view) => () => {
+    if (view == 'mmd') {
+      asf.editor.mmdView = true;
+    } else {
+      asf.editor.mmdView = false;
+    }
+  }
+
   export let asf;
 </script>
 
@@ -31,13 +37,39 @@
   .section-description {
     padding: 10px 20px;
   }
+
+  .skeleton-view-option {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .skeleton-view-option:hover {
+    text-decoration: underline;
+  }
+
+  .skeleton-view-option.selected {
+    color: magenta;
+    text-decoration: underline;
+    font-weight: 600;
+  }
 </style>
 
 <section>
   <div class="section-header">🖱️ SKELETON TREE</div>
   <div class="section-description">
-    {#if asf.loaded}
+    <nav>
+      <div class="skeleton-view-option" class:selected="{!asf.editor.mmdView}" on:click="{setView('asf')}">
+        asf view
+      </div>
+      <span> | </span>
+      <div class="skeleton-view-option" class:selected="{asf.editor.mmdView}" on:click="{setView('mmd')}">
+        mmd view
+      </div>
+    </nav>
+    {#if asf.loaded && !asf.editor.mmdView}
     <TweakTree bind:name="{asf.root.name}" bind:tree="{asf.tree}" bind:asf/>
+    {:else if asf.editor.mmdView && asf.mmd.loaded}
+    <TweakThreeTree bind:bone="{asf.mmd.mesh.skeleton.bones[0]}" bind:asf/>
     {:else}
     <p>Skeleton not loaded.</p>
     {/if}

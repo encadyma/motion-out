@@ -8,6 +8,7 @@ import TweakInspector from './TweakInspector.svelte';
 import AnimatePanel from './AnimatePanel.svelte';
 import AnimateInspector from './AnimateInspector.svelte';
 import AnimateTimeline from './AnimateTimeline.svelte';
+import StagePanel from './StagePanel.svelte';
 import NullPanel from './NullPanel.svelte';
 import Scene from './Scene.svelte';
 
@@ -36,6 +37,8 @@ let alerts = writable([]);
 	<AnimatePanel bind:asf bind:amc/>
 	<AnimateInspector bind:asf bind:amc/>
 	<AnimateTimeline bind:asf bind:amc/>
+	{:else if selectedView == 'stage'}
+	<StagePanel bind:asf bind:amc bind:scene/>
 	{:else}
 	<NullPanel/>
 	{/if}

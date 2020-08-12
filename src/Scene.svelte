@@ -62,7 +62,7 @@ function init() {
 	dirLight.shadow.camera.right = 2;
 	dirLight.shadow.camera.near = 0.1;
 	dirLight.shadow.camera.far = 40;
-    scene.add( dirLight );
+    // scene.add( dirLight );
 
     ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 	ground.rotation.x = - Math.PI / 2;
@@ -72,24 +72,6 @@ function init() {
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.y = 1;
     scene.add( mesh );
-
-    // Import Korone!
-    /*
-    let mmd_loader = new MMDLoader();
-    mmd_loader.load(
-        'assets/mmd/korone/戌神ころね＿v4.pmx',
-        function (mesh) {
-            console.log(mesh);
-            scene.add(mesh);
-        },
-        function (xhr) {
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-        },
-        function (error) {
-		    console.log( 'An error happened' );
-	    }
-    );
-    */
 
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
