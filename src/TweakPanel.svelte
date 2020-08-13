@@ -69,7 +69,7 @@
     {#if asf.loaded && !asf.editor.mmdView}
     <TweakTree bind:name="{asf.root.name}" bind:tree="{asf.tree}" bind:asf/>
     {:else if asf.editor.mmdView && asf.mmd.loaded}
-    <TweakThreeTree bind:bone="{asf.mmd.mesh.skeleton.bones[0]}" bind:asf/>
+    <TweakThreeTree bind:bone="{asf.mmd.skeleton.bones[0]}" bind:asf/>
     {:else}
     <p>Skeleton not loaded.</p>
     {/if}

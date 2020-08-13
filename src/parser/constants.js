@@ -2,9 +2,14 @@ export const TO_RADIANS = Math.PI / 180.0;
 
 export const toRadians = val => (val * TO_RADIANS);
 
+import * as THREE from 'three';
+
 export const AMC_FILES = {
     "golf": [
         { name: "golf_01", src: "assets/amc/golf/golf_01.amc" },
+    ],
+    "debug": [
+        { name: "null", src: "assets/amc/debug/null.amc" },
     ],
     "walk": [
         { name: "walk_03", src: "assets/amc/walk/walk_03.amc" },
@@ -130,72 +135,131 @@ export const STAGE_FILES = {
     },
 }
 
+export const HOLOLIVE_TRANSFORM = {
+    "root": {
+        position: new THREE.Vector3(30, -18, 30),
+        rotation: new THREE.Euler()
+    },
+    "lfemur": {
+        position: new THREE.Vector3(),
+        rotation: new THREE.Euler(-Math.PI / 4, 0, 0)
+    },
+    "rfemur": {
+        position: new THREE.Vector3(),
+        rotation: new THREE.Euler(-Math.PI / 4, 0, 0)
+    }
+}
+
 export const HOLOLIVE_BONEMAP = {
     "root": "全ての親",         // Maybe センター
 
     // lhipjoint tree
-    "lhipjoint": "左足",        // no degrees of freedom
+    // "lhipjoint": "左足",        // no degrees of freedom
     "lfemur": "左足",
     "ltibia": "左ひざ",
-    "lfoot": "左足IK親",
-    "ltoes": "左つま先",
+    "lfoot": "lfoot",
+    "ltoes": "左足首",
 
     // rhipjoint tree
-    "rhipjoint": "右足",        // no degrees of freedom
+    // "rhipjoint": "右足",        // no degrees of freedom
     "rfemur": "右足",
     "rtibia": "右ひざ",
-    "rfoot": "右足IK親",
-    "rtoes": "右つま先",
+    "rfoot": "rfoot",
+    "rtoes": "右足首",
 
     // Back stuff
-    "lowerback": "下半身",
+    "lowerback": "lowerback",
     "upperback": "上半身",
     "thorax": "上半身２",
     "lowerneck": "首",
-    "upperneck": "首",
+    "upperneck": "upperneck",
     "head": "頭",
 
-    "rclavicle": "右肩",
+    
+    "rclavicle": "rclavicle",
     "rhumerus": "右腕",
     "rradius": "右ひじ",
-    "rwrist": "左手首",
-    "rhand": "左手首",
-    "rfingers": "rfingers",
+    "rwrist": "右手首",
+    "rhand": "右手捩",
+    "rfingers": "右手先",
     "rthumb": "rthumb",
 
-    "lclavicle": "左肩",
+    "lclavicle": "lclavicle",
     "lhumerus": "左腕",
     "lradius": "左ひじ",
     "lwrist": "左手首",
-    "lhand": "左手首",
-    "lfingers": "lfingers",
+    "lhand": "左手捩",
+    "lfingers": "左手先",
     "lthumb": "lthumb",
     
 };
 
 export const MMD_FILES = {
+    "trackerman": {
+        id: "trackerman",
+        type: "FBX",
+        src: "assets/fbx/trackerman.fbx",
+        name: "Motion Capture Man",
+        name_jp: "Motion Capture Man",
+        author: "Mixamo.com",
+        website: "https://www.mixamo.com/",
+        bonemap: {
+            head: "Head",
+            lclavicle: "nobone",
+            lhand: "LeftHand",
+            lhumerus: "LeftShoulder",
+            lowerback: "Spine",
+            lowerneck: "Neck",
+            lradius: "LeftArm",
+            lwrist: "LeftForeArm",
+            rclavicle: "nobone",
+            root: "Hips",
+            thorax: "Spine2",
+            upperback: "Spine1",
+            upperneck: "Neck1",
+        },
+        transforms: {
+            "lowerback": {
+                position: new THREE.Vector3(),
+                rotation: new THREE.Euler(Math.PI / 2, 0, 0),
+            }
+        },
+        supported: true,
+    },
     "korone": {
+        id: "korone",
+        type: "MMD",
         src: "assets/mmd/korone/戌神ころね＿v4.pmx",
         name: "Inugami Korone",
         name_jp: "戌神ころね",
         author: "Cover Corp.",
         website: "https://www.mmd.hololive.tv/",
         bonemap: HOLOLIVE_BONEMAP,
+        transforms: HOLOLIVE_TRANSFORM,
+        supported: false,
     },
     "okayu": {
+        id: "okayu",
+        type: "MMD",
         src: "assets/mmd/okayu/猫又おかゆ.pmx",
         name: "Nekomata Okayu",
         name_jp: "猫又おかゆ",
         author: "Cover Corp.",
         website: "https://www.mmd.hololive.tv/",
         bonemap: HOLOLIVE_BONEMAP,
+        transforms: HOLOLIVE_TRANSFORM,
+        supported: false,
     },
     "mel": {
+        id: "mel",
+        type: "MMD",
         src: "assets/mmd/mel/夜空メル.pmx",
         name: "Yozora Mel",
         name_jp: "夜空メル",
         author: "Cover Corp.",
         website: "https://www.mmd.hololive.tv/",
         bonemap: HOLOLIVE_BONEMAP,
+        transforms: HOLOLIVE_TRANSFORM,
+        supported: false,
     }
 }

@@ -4,6 +4,7 @@
   import * as THREE from 'three';
   import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+  import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
   import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
   import { createEventDispatcher } from "svelte";
 
@@ -22,30 +23,51 @@
     }
 
     if (modelObj && asf.loaded) {
-      let mmd_loader = new MMDLoader();
-      mmd_loader.load(
+      let loader;
+      if (modelObj.type == "MMD") {
+        loader = new MMDLoader();
+      } else {
+        loader = new FBXLoader();
+      }
+
+      loader.load(
         modelObj.src,
         function (mesh) {
           console.log(mesh);
-          // Method 1: changing the Korone skeleton forcibly
+          // Method 1: changing the skeleton forcibly
           // mesh.skeleton = asf.three.skeleton;
-          asf.mmd.mesh = mesh;
-          asf.mmd.helper = new THREE.SkeletonHelper(mesh.skeleton.bones[0]);
+          
+          if (modelObj.id == "trackerman") {
+            // Special handling for FBX...
+            // TODO: move this to a data property
+            asf.mmd.mesh = mesh;
+            asf.mmd.skeleton = asf.mmd.mesh.children[2].children[6].skeleton;
+            asf.mmd.mesh.scale.copy(new THREE.Vector3(0.2, 0.2, 0.2));
+          } else {
+            asf.mmd.mesh = mesh;
+            asf.mmd.skeleton = mesh.skeleton;
+            asf.mmd.mesh.scale.copy(new THREE.Vector3(1 / 0.65, 1 / 0.65, 1 / 0.65));
+          }
+          
+          asf.mmd.helper = new THREE.SkeletonHelper(asf.mmd.skeleton.bones[0]);
           asf.mmd.metadata = modelObj;
           asf.mmd.bonemap = modelObj.bonemap;
-          statusMsg = `${modelObj.name} MMD loaded`;
+          asf.mmd.transforms = modelObj.transforms;
+
+          statusMsg = `${modelObj.name} character loaded`;
 
           scene.add(asf.mmd.helper);
           scene.add(asf.mmd.mesh);
-          statusMsg = `${modelObj.name} MMD added to scene`;
+          statusMsg = `${modelObj.name} character added to scene. Rendering may take a while.`;
           asf.mmd.loaded = true;
         },
         function (xhr) {
           statusMsg = 'MMD ' + Math.round( xhr.loaded / xhr.total * 100 ) + '% loaded';
         },
         function (error) {
-          statusMsg = `An error happened while loading the MMD`;
+          statusMsg = `An error happened while loading the character`;
           console.log( 'An error happened' );
+          console.error(error);
         }
       );
     } else if (!asf.loaded) {

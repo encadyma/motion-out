@@ -66,12 +66,14 @@ export class ASFParser {
     mmd = {
         loaded: false,
         mesh: null,
+        skeleton: null,
         metadata: {
             src: null,
             name: "No Model",
             author: "None"
         },
         bonemap: {},
+        transforms: {},
         helper: null,
         currBone: null
     };
@@ -609,14 +611,29 @@ export class ASFParser {
 
                 if (this.mmd.loaded && Object.keys(this.mmd.bonemap).includes(boneName) && this.mmd.bonemap[boneName] != null) {
                     // Attempt to puppet the MMD model as well
-                    const mmdbone = this.mmd.mesh.skeleton.getBoneByName(this.mmd.bonemap[boneName]);
+                    const mmdbone = this.mmd.skeleton.getBoneByName(this.mmd.bonemap[boneName]);
                     if (mmdbone) {
-                        
                         if (boneName == this.root.name) {
-                            mmdbone.position.copy(position.clone().add(new THREE.Vector3(30, 0, 30)));
+                            const newPosition = position.clone();
+                            if (this.mmd.transforms[boneName]) {
+                                newPosition.add(this.mmd.transforms[boneName].position);
+                            }
+                            this.mmd.mesh.position.copy(newPosition);
+                        }
+                        
+                        if (this.mmd.transforms[boneName] && this.mmd.transforms[boneName].rotation) {
+                            const newRotation = new THREE.Quaternion();
+                            this.setFromEuler(newRotation, this.mmd.transforms[boneName].rotation);
+                            newRotation.multiply(finalRotation);
+                            mmdbone.quaternion.copy(newRotation);
+                        } else {
+                            mmdbone.quaternion.copy(finalRotation);
+                        }
+
+                        if (this.mmd.transforms[boneName] && this.mmd.transforms[boneName].position) {
+                            mmdbone.position.copy(mmdbone.position.clone().add(this.mmd.transforms[boneName].position));
                         }
                         // mmdbone.position.copy(position);
-                        mmdbone.quaternion.copy(finalRotation);
                     }
                 }
             }

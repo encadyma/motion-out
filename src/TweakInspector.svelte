@@ -1,5 +1,41 @@
 <script>
+  import { onMount } from "svelte";
+  import * as THREE from 'three';
+
   export let asf;
+  let mmdView = false;
+  let nextBone = "nobone";
+
+  onMount(() => {
+    nextBone = asf.mmd.bonemap[asf.editor.currBone] ? asf.mmd.bonemap[asf.editor.currBone] : "nobone";
+  })
+
+  const setView = (view) => () => {
+    if (view == 'mmd') {
+      mmdView = true;
+    } else {
+      mmdView = false;
+    }
+  }
+
+  const createTransforms = () => {
+    asf.mmd.transforms[asf.editor.currBone] = {
+      position: new THREE.Vector3(),
+      rotation: new THREE.Euler()
+    }
+  }
+
+  const relinkBone = (n) => () => {
+    asf.mmd.bonemap[asf.editor.currBone] = n;
+    console.log(asf.mmd.bonemap)
+  }
+
+  const unlinkAll = () => {
+    for (const entry in asf.mmd.bonemap) {
+      asf.mmd.bonemap[entry] = "nobone";
+    }
+    console.log(asf.mmd.bonemap)
+  }
 
   const quatToString = (quat) => {
     return `Quaternion(${quat.x}, ${quat.y}, ${quat.z}, ${quat.w})`;
@@ -38,12 +74,55 @@
   .section-description {
     padding: 10px 20px;
   }
+
+  .skeleton-view-option {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .skeleton-view-option:hover {
+    text-decoration: underline;
+  }
+
+  .skeleton-view-option.selected {
+    color: magenta;
+    text-decoration: underline;
+    font-weight: 600;
+  }
 </style>
 
 <section>
   <div class="section-header">🖱️ INSPECTOR</div>
   <div class="section-description">
-    {#if asf.loaded}
+    <nav>
+      <div class="skeleton-view-option" class:selected="{!mmdView}" on:click="{setView('asf')}">
+        inspector
+      </div>
+      <span> | </span>
+      <div class="skeleton-view-option" class:selected="{mmdView}" on:click="{setView('mmd')}">
+        mmd post-transforms
+      </div>
+    </nav>
+    {#if asf.loaded && mmdView}
+      {#if asf.mmd.transforms[asf.editor.currBone]}
+        <p>Set the MMD correction transforms that will be applied to the bone.</p>
+        <b>transform x:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].position.x}" type="number" step="0.10"/><br/>
+        <b>transform y:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].position.y}" type="number" step="0.10"/><br/>
+        <b>transform z:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].position.z}" type="number" step="0.10"/><br/>
+        <b>euler x:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].rotation.x}" type="number" step="0.0628"/><br/>
+        <b>euler y:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].rotation.y}" type="number" step="0.0628"/><br/>
+        <b>euler z:</b>
+        <input bind:value="{asf.mmd.transforms[asf.editor.currBone].rotation.z}" type="number" step="0.0628"/><br/>
+      {:else}
+        <p>No post-animated MMD transforms have been set for this bone.</p>
+        <button on:click="{createTransforms}">Create empty MMD transforms</button>
+      {/if}
+    {:else if asf.loaded && !mmdView}
       {#if asf.editor.currBone == asf.root.name}
       <h3>Root Bone</h3>
       <ul>
@@ -78,9 +157,22 @@
       {:else}
       <p>Could not find the bone in the given skeleton.</p>
       {/if}
-      <ul>
-      
-      </ul>
+      <h3>MMD Properties</h3>
+      {#if asf.mmd.loaded}
+      <b>Current Linked: {asf.mmd.bonemap[asf.editor.currBone] ? asf.mmd.bonemap[asf.editor.currBone] : "no bone"}</b>
+      <br/>
+      <select bind:value={nextBone}>
+        <option value="nobone">No Bone</option>
+        {#each asf.mmd.skeleton.bones as bone}
+          <option value="{bone.name}">{bone.name}</option>
+        {/each}
+      </select>
+      <button on:click="{relinkBone(nextBone)}">Relink Bone</button>
+      <button on:click="{relinkBone("nobone")}">Unlink Bone</button>
+      <button on:click="{unlinkAll}">Unlink All Bones</button>
+      {:else}
+      <p>No MMD model loaded</p>
+      {/if}
     {:else}
     <p>No element selected.</p>
     {/if}
