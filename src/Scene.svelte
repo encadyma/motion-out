@@ -19,7 +19,7 @@ import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { onMount } from 'svelte';
 
-var elem;
+var elem, controls;
 var camera, renderer, clock, stats;
 var geometry, material, mesh;
 var ground, hemiLight, dirLight;
@@ -85,7 +85,7 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     elem.appendChild(renderer.domElement); 
 
-    var controls = new OrbitControls( camera, renderer.domElement );
+    controls = new OrbitControls( camera, renderer.domElement );
 	controls.enablePan = false;
     controls.enableZoom = true;
 	controls.update();
@@ -101,7 +101,14 @@ function animate() {
  
     mesh.rotation.x += 0.01;
     mesh.rotation.y += 0.02;
- 
+
+    if (asf.editor.shouldRotate) {
+        controls.autoRotate = true;
+    } else {
+        controls.autoRotate = false;
+    }
+
+    controls.update();
     renderer.render( scene, camera );
 
     stats.update();

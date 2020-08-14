@@ -10,6 +10,10 @@
     }
   }
 
+  const toggleSkeleton = () => {
+    asf.mmd.helper.visible = !asf.mmd.helper.visible;
+  }
+
   export let asf;
 </script>
 
@@ -70,6 +74,7 @@
     <TweakTree bind:name="{asf.root.name}" bind:tree="{asf.tree}" bind:asf/>
     {:else if asf.editor.mmdView && asf.mmd.loaded}
     <TweakThreeTree bind:bone="{asf.mmd.skeleton.bones[0]}" bind:asf/>
+    <button on:click="{toggleSkeleton}">Toggle Skeleton Helper</button>
     {:else}
     <p>Skeleton not loaded.</p>
     {/if}

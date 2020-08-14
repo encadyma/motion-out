@@ -61,6 +61,7 @@ export class ASFParser {
         currBone: "root",
         isBaking: false,
         mmdView: false,
+        shouldRotate: false,
     };
 
     mmd = {
@@ -619,6 +620,8 @@ export class ASFParser {
                                 newPosition.add(this.mmd.transforms[boneName].position);
                             }
                             this.mmd.mesh.position.copy(newPosition);
+                        } else if (this.mmd.transforms[boneName] && this.mmd.transforms[boneName].position) {
+                            mmdbone.position.copy(this.mmd.transforms[boneName].position);
                         }
                         
                         if (this.mmd.transforms[boneName] && this.mmd.transforms[boneName].rotation) {
@@ -628,10 +631,6 @@ export class ASFParser {
                             mmdbone.quaternion.copy(newRotation);
                         } else {
                             mmdbone.quaternion.copy(finalRotation);
-                        }
-
-                        if (this.mmd.transforms[boneName] && this.mmd.transforms[boneName].position) {
-                            mmdbone.position.copy(mmdbone.position.clone().add(this.mmd.transforms[boneName].position));
                         }
                         // mmdbone.position.copy(position);
                     }

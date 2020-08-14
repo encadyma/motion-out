@@ -51,6 +51,8 @@
       amc.player.fps = 120;
     } else if (amc.player.fps == 120) {
       amc.player.fps = 1000;
+    } else if (amc.player.fps == 1000) {
+      amc.player.fps = 1;
     } else {
       amc.player.fps = 10;
     }

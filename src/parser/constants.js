@@ -205,24 +205,88 @@ export const MMD_FILES = {
         website: "https://www.mixamo.com/",
         bonemap: {
             head: "Head",
-            lclavicle: "nobone",
-            lhand: "LeftHand",
-            lhumerus: "LeftShoulder",
+            root: "Hips",
             lowerback: "Spine",
             lowerneck: "Neck",
+            lclavicle: "nobone",
+            lhumerus: "LeftShoulder",
             lradius: "LeftArm",
             lwrist: "LeftForeArm",
+            lhand: "LeftHand",
             rclavicle: "nobone",
-            root: "Hips",
+            rhumerus: "RightShoulder",
+            rradius: "RightArm",
+            rwrist: "RightForeArm",
+            rhand: "RightHand",
             thorax: "Spine2",
             upperback: "Spine1",
             upperneck: "Neck1",
+            lfemur: "LeftUpLeg",
+            ltibia: "LeftLeg",
+            lfoot: "LeftFoot",
+            ltoes: "LeftToeBase",
+            rfemur: "RightUpLeg",
+            rtibia: "RightLeg",
+            rfoot: "RightFoot",
+            rtoes: "RightToeBase",
         },
         transforms: {
+            "root": {
+                position: new THREE.Vector3(-20, -20, 20),
+                rotation: new THREE.Euler(0.5, 0, 0)
+            },
             "lowerback": {
                 position: new THREE.Vector3(),
                 rotation: new THREE.Euler(Math.PI / 2, 0, 0),
-            }
+            },
+            "lfemur": {
+                position: new THREE.Vector3(9.6, -3, 3),
+                rotation: new THREE.Euler(-0.1884, 0, 0),
+            },
+            "rfemur": {
+                position: new THREE.Vector3(-9.6, -3, 3),
+                rotation: new THREE.Euler(-0.1884, 0, 0),
+            },
+            "ltibia": {
+                position: new THREE.Vector3(0, -42, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
+            "rtibia": {
+                position: new THREE.Vector3(0, -42, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
+            "lfoot": {
+                position: new THREE.Vector3(0.006493491607029611, -39.1481200728814, -1.9998497455948971),
+                rotation: new THREE.Euler(Math.PI / 2, 0, 0),
+            },
+            "rfoot": {
+                position: new THREE.Vector3(0.0064930247571783895, -39.14820955917779, -1.9980972354863404),
+                rotation: new THREE.Euler(Math.PI / 2, 0, 0),
+            },
+            "lhumerus": {
+                position: new THREE.Vector3(10, 10, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
+            "rhumerus": {
+                position: new THREE.Vector3(-10, 10, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
+            "lradius": {
+                position: new THREE.Vector3(12.3, -5.6, 3),
+                rotation: new THREE.Euler(0, 0, -0.4396),
+            },
+            "rradius": {
+                position: new THREE.Vector3(-12.3, -5.6, 3),
+                rotation: new THREE.Euler(0, 0, -0.4396),
+            },
+            "lwrist": {
+                position: new THREE.Vector3(27.7, 0, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
+            "rwrist": {
+                position: new THREE.Vector3(-27.7, 0, 0),
+                rotation: new THREE.Euler(0, 0, 0),
+            },
         },
         supported: true,
     },

@@ -20,7 +20,8 @@
 
   const createTransforms = () => {
     asf.mmd.transforms[asf.editor.currBone] = {
-      position: new THREE.Vector3(),
+      position: asf.mmd.skeleton.getBoneByName(asf.mmd.bonemap[asf.editor.currBone]) ? 
+        asf.mmd.skeleton.getBoneByName(asf.mmd.bonemap[asf.editor.currBone]).position.clone() : asf.three.bones[asf.editor.currBone].position.clone(),
       rotation: new THREE.Euler()
     }
   }
