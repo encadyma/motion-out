@@ -62,6 +62,7 @@ export class ASFParser {
         isBaking: false,
         mmdView: false,
         shouldRotate: false,
+        hidden: false,
     };
 
     mmd = {

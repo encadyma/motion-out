@@ -1,8 +1,9 @@
 <script>
+import { fade } from 'svelte/transition';
 import { createEventDispatcher } from 'svelte';
 const dispatch = createEventDispatcher();
 
-export let selectedView;
+export let selectedView, asf;
 
 const select = nextView => () => {
     selectedView = nextView;
@@ -12,7 +13,8 @@ const select = nextView => () => {
 
 <header>
     <h1>Motion Out!</h1>
-    <nav>
+    {#if !asf.editor.hidden}
+    <nav transition:fade="{{delay: 0, duration: 400}}">
         <div class="nav-item"
             class:nav-item-active="{selectedView === 'view'}"
             on:click="{select('view')}">👁️ View</div>
@@ -29,6 +31,7 @@ const select = nextView => () => {
             class:nav-item-active="{selectedView === 'stage'}"
             on:click="{select('stage')}">🎭 Stage</div>
     </nav>
+    {/if}
 </header>
 
 <style>

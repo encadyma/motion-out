@@ -60,6 +60,7 @@
           scene.add(asf.mmd.mesh);
           statusMsg = `${modelObj.name} character added to scene. Rendering may take a while.`;
           asf.mmd.loaded = true;
+          amc = amc;
         },
         function (xhr) {
           statusMsg = 'MMD ' + Math.round( xhr.loaded / xhr.total * 100 ) + '% loaded';
