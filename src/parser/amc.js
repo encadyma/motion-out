@@ -46,6 +46,8 @@ export class AMCParser {
         let index = 0;
         this.tokens = [];
 
+        console.time("tokenize amc");
+
         while (index < lines.length) {
             const line = lines[index].trim();
             if (this.TOKEN_KEYWORD_RGX.test(line)) {
@@ -73,12 +75,16 @@ export class AMCParser {
             index++;
         }
 
+        console.timeEnd("tokenize amc");
+
         return this.tokens;
     }
 
     process() {
         this.frames = [];
         this.frameCount = 0;
+
+        console.time("parser amc");
 
         let index = 0;
         while (index < this.tokens.length) {
@@ -121,6 +127,7 @@ export class AMCParser {
         this.loaded = true;
 
         console.log(this.frames);
+        console.timeEnd("parser amc");
 
         return this.frames;
     }

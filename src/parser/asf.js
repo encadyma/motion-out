@@ -97,6 +97,7 @@ export class ASFParser {
      * @returns {Array} processed tokens
      */
     tokenize(raw_file) {
+        console.time("tokenize");
         const lines = raw_file.split('\n');
         let index = 0;
         this.tokens = [];
@@ -181,6 +182,8 @@ export class ASFParser {
             index++;
         }
 
+        console.timeEnd("tokenize");
+
         return this.tokens;
     }
 
@@ -190,6 +193,7 @@ export class ASFParser {
     process() {
         let index = 0;
         let currentKey;
+        console.time("parser");
 
         while (index < this.tokens.length) {
             const token = this.tokens[index];
@@ -414,6 +418,7 @@ export class ASFParser {
 
             index++;
         }
+        console.timeEnd("parser");
 
         this.loaded = true;
     }
@@ -422,6 +427,9 @@ export class ASFParser {
      * Constructs the three.js skeleton.
      */
     construct() {
+        // Setup timers for construction!
+        console.time("THREE.js skeleton construct");
+
         // Setup the root node.
         this.three.bones = {};
 
@@ -487,6 +495,8 @@ export class ASFParser {
         this.three.container.add(root);
 
         this.three.enabled = true;
+        console.timeEnd("THREE.js skeleton construct");
+
         return this.three.skeleton;
     }
 
@@ -495,6 +505,7 @@ export class ASFParser {
      * based on incoming KEYDATA.
      */
     frameUpdate(keydata, updateBones = true) {
+        console.time("frame update");
         let result = {};
 
         if (updateBones) {
@@ -650,6 +661,8 @@ export class ASFParser {
             this.three.bones[this.root.name].updateMatrixWorld();
             this.three.skeleton.update();
         }
+
+        console.timeEnd("frame update");
         
         return result;
     }
