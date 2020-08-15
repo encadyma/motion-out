@@ -1,9 +1,6 @@
 # Motion Out! CS184 Summer 2020 Final Project #18
 
 ![GIF of Michael Jackson dancing](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mjackson.gif)
-![Cover image with mocap skeleton alongside real skeleton](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mocapman-a1.gif)
-![GIF of Martial Arts Walking on Dragon](https://encadyma.github.io/motion-out/screenshots/0813-mvpa-dragon.gif)
-![GIF of tooling on the browser](https://i.fluffy.cc/F4sr5xmMchRXh5dx0P0v6lrJG0BqQwdt.gif)
 
 **Live Project URL**: [https://motionout.kevmo.xyz/](https://motionout.kevmo.xyz/)
 **Presentation URL**: [Google Slides](https://docs.google.com/presentation/d/1Jf7SlY43Y-vfldFPQxG4iYvQUiBjpsAMhgJ1Bar_4Qc/edit#slide=id.gdbc0015146ccb8_4)
@@ -39,9 +36,11 @@ The motion capture data itself was obtained through CMU's motion capture databas
 
 ### Understanding the Skeleton
 ![Image of the skeleton parser, 08/09](https://notes.ocf.berkeley.edu/uploads/upload_eb45ae394062add76bcb3dee05d69203.png)
+
 _Image of the skeleton parser on 08/09, with just the inspector and visual tokenizer._
 
 ![Image of the skeleton parser, 08/11](https://notes.ocf.berkeley.edu/uploads/upload_20ec7908f0969cbad352b5043de4aa7e.png)
+
 _Image of the skeleton parser on 08/11, with the interpreted skeleton alongside the inspected skeleton definition file._
 
 Before any work can be done with any motion capture data, there first needs to be a skeleton where that data can be applied. In the case of CMU's MoCap database, a skeleton is defined through an ASF file (**A**cclaim **S**keleton **F**ile), which is an ASCII text file format that defines the metadata of the skeleton, all bones and their degrees of freedom, and the hierarchy of the bone structure. One of the first tools for the editor I built was a visual tokenizer that helped distinguish the purpose of each line in the .ASF file.
@@ -101,9 +100,11 @@ With the skeleton data now processed, the data can now be passed to THREE.js, wh
 
 ### Getting the skeleton to move!
 ![GIF of Skeleton moving #1, 08/11](https://notes.ocf.berkeley.edu/uploads/upload_56118762c810edd2e9cb419ce44b7ee0.gif)
+
 _GIF of the Skeleton doing a "Modern Dance" from one perspective, 08/11_
 
 ![GIF of Skeleton moving #2, 08/11](https://notes.ocf.berkeley.edu/uploads/upload_cced20add6c36d341f1c7a66fef1280a.gif)
+
 _GIF of the Skeleton doing the same "Modern Dance" from another perspective, 08/11_
 
 With the skeleton primed, we can start applying motion data to the skeleton. Similar to an .ASF, motion capture data is stored in an ASCII-based .AMC (**A**cclaim **M**otion **C**apture) file. Unlike the hierarchical .ASF, however, the .AMC is simpler as it lays out the keyframe data for each bone in a list.
@@ -152,6 +153,7 @@ To counter this, we can pre-calculate all the frames and rotations, then bake/re
 ### Placing some more skin in the game
 
 ![image alt](https://i.fluffy.cc/psWfjqv7TfbxrxDlzPqXmQ2zHpWQRQb6.gif)
+
 _Viewing the bone structure of Inugami Korone in MikuMikuDance. Notice the increased complexity of the model compared to the motion capture skeleton._
 
 The next biggest challenge was combining our skeleton + motion capture data with actual meshes. Most meshes come packaged pre-rigged with skeletons ready to go, which presented a new set of unique problems. After playing around with multiple different models and transforming their rotations and positions naively, here ware some of observations I made and headaches encountered:
@@ -169,14 +171,17 @@ The next biggest challenge was combining our skeleton + motion capture data with
 Below is a couple of screenshots of how motion data can look when applied incorrectly:
 
 ![Applying Position + Rotation Data](https://encadyma.github.io/motion-out/screenshots/0811-mvpa-brokenmel.gif)
+
 _Applying Position + Rotation data to each bone on Yozora Mel._
 
 ![Applying Rotation Only](https://encadyma.github.io/motion-out/screenshots/0811-mvpa-badkorone.gif)
+
 _Applying Rotation data only to each bone on Inugami Korone._
 
 Because a naive implementation of bone matching wouldn't suffice, a composite solution had to be implemented. There is still one-to-one bone matching, but each character bone can have a set of transformations applied beforehand, such as a new position + additional rotation, to match with the regular skeleton. In an ideal solution, this would be applied automatically through a correctional algorithm that can adjust the character skeleton to be similar to the CMU skeleton. The next best option was to do this through manual correction, which is what the current editor supplies. Through manual corrections by eye, the model can get close to the actual skeleton!
 
 ![Pretty Close](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mocapman-a1.gif)
+
 _Rotation Only on the Motion Capture Man (Mixamo.com) with manual corrections applied to the legs._
 
 In future iterations of the project, I hope to flesh this part of the project out more!
@@ -225,6 +230,18 @@ This project also features a host of quality-of-life enhancements that make the 
 
 ## Other Screenshots
 All of the historical screenshots that I've taken, including GIFs, can be found [in the Github repository here](https://github.com/encadyma/motion-out/tree/master/docs/screenshots).
+
+![Cover image with mocap skeleton alongside real skeleton](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mocapman-a1.gif)
+
+_Cover image with mocap skeleton alongside real skeleton_
+
+![GIF of Martial Arts Walking on Dragon](https://encadyma.github.io/motion-out/screenshots/0813-mvpa-dragon.gif)
+
+_GIF of Martial Arts Walking on Dragon_
+
+![GIF of tooling on the browser](https://i.fluffy.cc/F4sr5xmMchRXh5dx0P0v6lrJG0BqQwdt.gif)
+
+_GIF of tooling on the browser_
 
 ## References
 [1] CMU Motion Capture Database (http://mocap.cs.cmu.edu)
