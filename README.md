@@ -1,27 +1,23 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
----
+# Motion Out! CS184 Summer 2020 Final Project #18
 
-# svelte app
+![GIF of Michael Jackson dancing](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mjackson.gif)
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
+**Live Project URL**: [https://motionout.kevmo.xyz/](https://motionout.kevmo.xyz/)
+**Presentation URL**: [Google Slides](https://docs.google.com/presentation/d/1Jf7SlY43Y-vfldFPQxG4iYvQUiBjpsAMhgJ1Bar_4Qc/edit#slide=id.gdbc0015146ccb8_4)
 
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+## Abstract
 
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
+This project focuses on bringing motion data alive from CMU’s motion capture database onto a web platform using WebGL. Much of the challenge will come from translating the motion capture data (distributed in Acclaim's ASF/AMC formats) into useful movements for our skeleton and designing a system capable of rendering out these motions accurately and efficiently. With the goal of portability in mind, this project will also allow users to tweak the motion data and animate it on a given 3D character model.
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
+On this website, I detail the technical approach I took and some of the pitfalls I encountered, as well as give visualizations of the project results and a vision for future iterations of this project.
 
-
-## Get started
+## Installation
 
 Install the dependencies...
 
 ```bash
-cd svelte-app
+cd motion-out
 npm install
 ```
 
@@ -35,7 +31,6 @@ Navigate to [localhost:5000](http://localhost:5000). You should see your app run
 
 By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
 
-
 ## Building and running in production mode
 
 To create an optimised version of the app:
@@ -46,59 +41,32 @@ npm run build
 
 You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
 
+## Future Plans
+- Improving processing speed by doing it through WebAssembly (to make it go even faster!).
+- Adding support for more motion capture formats (.fbx)
+- Abstracting away the parser and making it an official loader for THREE.js
+- Other portability plans, such as making it a chatbot GIF service, making a video editor from it, etc.
 
-## Single-page app mode
+## Screenshots
+All of the historical screenshots that I've taken, including GIFs, can be found [in the Github repository here](https://github.com/encadyma/motion-out/tree/master/docs/screenshots).
 
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
+![Cover image with mocap skeleton alongside real skeleton](https://encadyma.github.io/motion-out/screenshots/0813-mvp-mocapman-a1.gif)
 
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
+_Cover image with mocap skeleton alongside real skeleton_
 
-```js
-"start": "sirv public --single"
-```
+![GIF of Martial Arts Walking on Dragon](https://encadyma.github.io/motion-out/screenshots/0813-mvpa-dragon.gif)
 
-## Using TypeScript
+_GIF of Martial Arts Walking on Dragon_
 
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
+![GIF of tooling on the browser](https://i.fluffy.cc/F4sr5xmMchRXh5dx0P0v6lrJG0BqQwdt.gif)
 
-```bash
-node scripts/setupTypeScript.js
-```
+_GIF of tooling on the browser_
 
-Or remove the script via:
+## References
+[1] CMU Motion Capture Database (http://mocap.cs.cmu.edu)
+[2] Article on file parsing help for AMC/ASF (https://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/ASF-AMC.html)
 
-```bash
-rm scripts/setupTypeScript.js
-```
-
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
-```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+## Credits
+- Kevin Mo (creator of the tool you see here)
+- CMU for providing the Motion Capture Database (http://mocap.cs.cmu.edu). The database was created with funding from NSF EIA-0196217.
+- Mixamo.com, Hololive/Cover Corp., CS184 Course Staff for providing models
